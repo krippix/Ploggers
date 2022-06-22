@@ -3,6 +3,7 @@ package de.aop.parser.expressions;
 public abstract class IToken 
 {
 	protected IToken left, right;
+	protected int position;
 	
 	public abstract double eval(double x);
 	

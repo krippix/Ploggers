@@ -1,10 +1,11 @@
 package de.aop.parser.expressions;
 
+import de.aop.exceptions.SyntaxError;
 import de.aop.parser.ParseString;
 
 public class Subtraction extends Expression
 {
-	public Subtraction(ParseString input, IToken left) throws Exception
+	public Subtraction(ParseString input, IToken left) throws SyntaxError
 	{
 		this.left = left;
 		input.next();

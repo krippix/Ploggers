@@ -1,12 +1,13 @@
 package de.aop.parser.expressions;
 
+import de.aop.exceptions.SyntaxError;
 import de.aop.parser.ParseString;
 
 public class Identifier extends Atom
 {
 	private int exponent = 1;
 	
-	public Identifier(ParseString input)
+	public Identifier(ParseString input) throws SyntaxError
 	{
 		input.next();
 		if(input.getCurrentToken() != '^')
@@ -21,7 +22,14 @@ public class Identifier extends Atom
 			input.next();
 		}
 		
-		this.exponent = Integer.parseInt(number);
+		try 
+		{
+			this.exponent = Integer.parseInt(number);
+		}
+		catch(NumberFormatException e)
+		{
+			throw new SyntaxError(input.getPos(), "^ needs to be followed by a positive integer.");
+		}
 	}
 	
 	@Override

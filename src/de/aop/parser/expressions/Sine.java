@@ -1,17 +1,18 @@
 package de.aop.parser.expressions;
 
+import de.aop.exceptions.SyntaxError;
 import de.aop.parser.ParseString;
 
 public class Sine extends Atom
 {
-	Sine(ParseString input) throws Exception
+	Sine(ParseString input) throws SyntaxError
 	{
 		input.next(); input.next(); input.next();	// Flush sin
 		
 		input.next();
 		this.left = Expression.getNextToken(input);
 		if(input.getCurrentToken() != ')')
-			throw new Exception("lol");
+			throw new SyntaxError(input.getPos(), "Expected ')', got '" + input.getCurrentToken() + "' instead");
 		
 		input.next();
 	}

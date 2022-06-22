@@ -1,10 +1,11 @@
 package de.aop.parser.expressions;
 
+import de.aop.exceptions.SyntaxError;
 import de.aop.parser.ParseString;
 
 public abstract class Atom extends IToken
 {
-	static IToken getNextToken(ParseString input) throws Exception
+	static IToken getNextToken(ParseString input) throws SyntaxError
 	{
 		IToken nextToken = null;
 		
@@ -22,7 +23,7 @@ public abstract class Atom extends IToken
 			input.next();
 			nextToken = Expression.getNextToken(input);
 			if(input.getCurrentToken() != ')')
-				throw new Exception("lol");
+				throw new SyntaxError(input.getPos(), "Expected ')', got '" + input.getCurrentToken() + "' instead");
 			
 			input.next();
 			break;

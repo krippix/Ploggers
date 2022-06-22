@@ -32,4 +32,9 @@ public class ParseString
 	{
 		currentPos++;
 	}
+	
+	public int getPos()
+	{
+		return currentPos;
+	}
 }
