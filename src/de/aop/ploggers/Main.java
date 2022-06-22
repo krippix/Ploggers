@@ -1,5 +1,6 @@
 package de.aop.ploggers;
 
+import de.aop.gui.*;
 import de.aop.exceptions.SyntaxError;
 import de.aop.parser.Parser;
 
@@ -24,5 +25,8 @@ public class Main
 		}
 		
 		System.out.println(parser.eval(2));
+
+		System.out.println("Ploggies is starting!");
+		GUI gui = new GUI();
 	}
 }
