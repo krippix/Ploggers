@@ -18,6 +18,12 @@ public abstract class Expression extends IToken
 		case '-':
 			nextToken = new Subtraction(input, nextToken);
 			break;
+			
+		case '\0':
+			break;
+			
+		default:
+			throw new SyntaxError(input.getPos(), "Unexpected symbol '" + input.getCurrentToken() + "'");
 		}
 		
 		return nextToken;

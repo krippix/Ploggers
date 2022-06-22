@@ -9,6 +9,9 @@ public abstract class IToken
 	
 	public IToken optimize()
 	{
+		if(this instanceof Identifier)
+			return this;
+		
 		if(this.left != null)
 			this.left = this.left.optimize();
 		

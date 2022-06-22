@@ -18,6 +18,9 @@ public abstract class Term extends IToken
 		case '/':
 			nextToken = new Division(input, nextToken);
 			break;
+			
+		case '\0':
+			break;
 		}
 		
 		return nextToken;
