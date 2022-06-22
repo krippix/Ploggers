@@ -1,12 +1,20 @@
 package de.aop.parser;
 
+import de.aop.parser.expressions.Expression;
+import de.aop.parser.expressions.IToken;
+
 public class Parser 
 {
 	private String originalInput;
-	
-	Parser(String input)
+	private int currentToken = 0;
+	private IToken anchor;
+
+	public Parser(String input) throws Exception
 	{
-		this.originalInput = input;
+		this.originalInput = input.replaceAll("\\s+","");
+		
+		ParseString ps = new ParseString(this.originalInput);
+		anchor = Expression.getNextToken(ps);
 	}
 	
 	public String getInput()
@@ -14,9 +22,9 @@ public class Parser
 		return originalInput;
 	}
 	
-	public double eval()
+	public double eval(double x)
 	{
 		// TODO: Return eval() of tree node
-		return 0.0;
+		return anchor.eval(x);
 	}
 }
