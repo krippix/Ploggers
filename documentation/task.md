@@ -7,10 +7,12 @@ sich möglichst dem Minima und Maxima anpassen. Bitte sehen eine besondere Behan
 von möglichen Polstellen vor.
 Es soll nur die Angabe einer Variablen zulässig sein.
 Die zulässigen Operationen sind: +, - (monadisch, dyadisch), \*, / und ^ (hoch)
-Hinweise:
+
+### Hinweise:
 In dem ZIP-Archiv „Funktionsplot“ ist ein Parser abgelegt, der in der Lage ist (oder sein soll)
 einen solchen Ausdruck zu analysieren und daraus einen Strukturbaum zu generieren.
 Als Anhang ist in der Datei „Die LL(1)Grammatik.pdf“ die Grammatik dargestellt.
-Optionale Aufgabe:
+
+## Optionale Aufgabe:
 Erweitern Sie das Programm (und den Parser) so, dass auch Funktionen wie Sinus, Cosinus
 oder Exponential-Funktion usw. als Terme zulässig sind.
