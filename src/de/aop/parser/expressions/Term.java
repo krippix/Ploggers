@@ -8,6 +8,17 @@ public abstract class Term extends IToken
 	{
 		IToken nextToken = Atom.getNextToken(input);
 		
+		switch(input.getCurrentToken())
+		{
+		case '*':
+			nextToken = new Multiplication(input, nextToken);
+			break;
+			
+		case '/':
+			nextToken = new Division(input, nextToken);
+			break;
+		}
+		
 		return nextToken;
 	}
 }

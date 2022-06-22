@@ -11,6 +11,7 @@ public abstract class Atom extends IToken
 		switch(input.getCurrentToken())
 		{
 		case 'x':	// id H
+			nextToken = new Identifier(input);
 			break;
 			
 		case '-':	// Unary -
