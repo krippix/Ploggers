@@ -27,6 +27,18 @@ public abstract class Atom extends IToken
 			input.next();
 			break;
 			
+		case 's':
+			nextToken = new Sine(input);
+			break;
+			
+		case 'c':
+			nextToken = new Cosine(input);
+			break;
+			
+		case 'e':
+			nextToken = new Exponential(input);
+			break;
+			
 		default:	// Number
 			nextToken = new Rational(input);
 			break;
