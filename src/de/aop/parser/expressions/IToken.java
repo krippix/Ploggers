@@ -14,7 +14,8 @@ public abstract class IToken
 		if(this.right != null)
 			this.right = this.right.optimize();
 		
-		if(this.left instanceof Rational && this.right instanceof Rational)
+		if((this.left == null || this.left instanceof Rational) && 
+		   (this.right == null || this.right instanceof Rational))
 			return new Rational(this.eval(0));
 		
 		return this;

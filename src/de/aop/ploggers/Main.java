@@ -6,7 +6,7 @@ public class Main
 {
 	public static void main(String args[]) throws Exception
 	{
-		Parser parser = new Parser("4*x + 2 + 4 + 6");
+		Parser parser = new Parser("sin(cos(exp(cos(sin(cos(exp(exp(sin(3)))))))))");
 		System.out.println(parser.eval(2));
 	}
 }
