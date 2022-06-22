@@ -9,7 +9,7 @@ public class Multiplication extends Expression
 		this.left = left;
 		input.next();
 		
-		this.right = Expression.getNextToken(input);
+		this.right = Term.getNextToken(input);
 	}
 	
 	@Override

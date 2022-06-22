@@ -9,7 +9,7 @@ public class Division extends Expression
 		this.left = left;
 		input.next();
 		
-		this.right = Expression.getNextToken(input);
+		this.right = Term.getNextToken(input);
 		// Maybe check for explicit division by 0
 	}
 	

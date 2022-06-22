@@ -20,6 +20,11 @@ public class Rational extends Atom
 		
 		this.value = Double.parseDouble(number);
 	}
+	
+	public Rational(double defaultVal)
+	{
+		this.value = defaultVal;
+	}
 
 	@Override
 	public double eval(double x)

@@ -15,6 +15,7 @@ public class Parser
 		
 		ParseString ps = new ParseString(this.originalInput);
 		anchor = Expression.getNextToken(ps);
+		anchor.optimize();
 	}
 	
 	public String getInput()

@@ -17,5 +17,4 @@ public class Addition extends Expression
 	{
 		return this.left.eval(x) + this.right.eval(x);
 	}
-
 }
