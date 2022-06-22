@@ -11,7 +11,9 @@ T  ::= F T'
 
 T' ::= * F T' | / F T' |
 
-F  ::= id H | num | - F | ( E )
+F  ::= id H | num | - F | ( E ) | O ( E )
 
-H  :: = ^int 
+H  ::= ^int |
+
+O  ::= sin | cos | exp
 ```
