@@ -8,3 +8,6 @@ Exam project second semester.
 
 ## Planned GUI
 ![Image of GUI](documentation/ploggers_gui.jpeg)
+
+## Actual GUI
+![Image of GUI](documentation/GUI.png)
