@@ -22,7 +22,8 @@ public class Plot extends JPanel
 	private Parser data;
 	private int markerGap;
 	private Coordinate middle;
-	double scale = 4; // probably only visual :D
+
+	double scale = 2; // probably only visual :D
 	
 	/**
 	 * 
@@ -30,7 +31,7 @@ public class Plot extends JPanel
 	public Plot()
 	{
 		// ToDo, Roberts dateityp entgegenehmen, oder in anderer Klasse die wichtigen Punkte berechnen
-		// Klasse dafür wird vermutlich Graph, in der sollen dann die Wichtigen Punkte und der Parse abgelegt werden.
+		// Klasse dafÃ¼r wird vermutlich Graph, in der sollen dann die Wichtigen Punkte und der Parse abgelegt werden.
 	}	
 	
 	
@@ -64,7 +65,7 @@ public class Plot extends JPanel
 	    	drawFunction(g2);
 	    }
 	    
-	    // TODO Anhand der Extrempunkte usw. feststellen welcher Teil des Graphen überhaupt interessant ist.
+	    // TODO Anhand der Extrempunkte usw. feststellen welcher Teil des Graphen Ã¼berhaupt interessant ist.
 	    
 	}
     

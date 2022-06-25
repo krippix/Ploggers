@@ -21,9 +21,6 @@ public abstract class Expression extends IToken
 			
 		case '\0':
 			break;
-			
-		default:
-			throw new SyntaxError(input.getPos(), "Unexpected symbol '" + input.getCurrentToken() + "'");
 		}
 		
 		return nextToken;
