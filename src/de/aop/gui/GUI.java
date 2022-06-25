@@ -66,22 +66,28 @@ public class GUI extends JFrame
 		GridBagConstraints format = new GridBagConstraints();
 		
 		// Text input
+		format.gridx = 0;
 		format.gridy = 0;
 		format.weighty = 1;
 		format.insets = new Insets(4,4,4,4); // top, left, bottom, right
 		format.anchor = GridBagConstraints.NORTH;
 		format.fill = GridBagConstraints.HORIZONTAL;
 		this.functionInput = new JTextField(1);
+		this.functionInput.setText("f(x)");
+		this.functionInput.setPreferredSize(new Dimension(0,30)); // width, height
+		// TODO this.functionInput.addFocusListener(null)
 		this.functionInput.addActionListener(e->generatePlot());
 		
 		this.menuPanel.add(this.functionInput, format);
 					
-		// Button "generate"
+		// Button "generate" --> This button determines the size of the side panel
+		format.gridx = 0;
 		format.gridy = 10;
 		format.insets = new Insets(4,4,4,4); // top, left, bottom, right
 		format.anchor = GridBagConstraints.SOUTH;
 		format.fill = GridBagConstraints.HORIZONTAL;
-		this.buttonGenerate = new JButton("Generate");
+		this.buttonGenerate = new JButton("Generate Graph");
+		this.buttonGenerate.setPreferredSize(new Dimension(150,30)); // width, height
 		this.buttonGenerate.addActionListener(e->generatePlot());
 		
 		this.menuPanel.add(this.buttonGenerate, format);
@@ -96,14 +102,15 @@ public class GUI extends JFrame
 		this.basePanel.add(this.infoPanel, BorderLayout.SOUTH);
 		
 		// Information panel - content
-		JButton test = new JButton("test");
-		this.infoPanel.add(test);
+		JTextField infoText1 = new JTextField("Read only test text");
+		infoText1.setEditable(false);
+		this.infoPanel.add(infoText1);
 		
 		
 		// Content panel
 		this.contentPanel = new Plot();
 		this.contentPanel.setBackground(Color.white);
-		this.contentPanel.setMinimumSize(new Dimension(1000,600));
+		this.contentPanel.setMinimumSize(new Dimension(2000,2000));
 		
 		this.basePanel.add(this.contentPanel, BorderLayout.CENTER);
 

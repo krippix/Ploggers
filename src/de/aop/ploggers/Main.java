@@ -8,7 +8,7 @@ public class Main
 {
 	public static void main(String args[]) throws Exception
 	{
-		Parser parser = new Parser("x^4+ 5x");
+		Parser parser = new Parser("x^4-5");
 		
 		if(!parser.good())
 		{
