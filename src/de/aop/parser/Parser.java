@@ -11,7 +11,7 @@ public class Parser
 	
 	private SyntaxError error = null;
 
-	public Parser(String input) throws SyntaxError
+	public Parser(String input)
 	{
 		this.originalInput = input.replaceAll("\\s+","");
 		
