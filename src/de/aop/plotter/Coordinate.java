@@ -3,32 +3,65 @@ package de.aop.plotter;
 // This class is supposed to make handling coordinates easier to handle
 public class Coordinate
 {
-	public int x = 0;
-	public int y = 0;
+	public double x = 0;
+	public double y = 0;
 	
 	
-	Coordinate(int x, int y)
+	// Constructors
+	
+	public Coordinate(int x, int y)
 	{
 		this.x = x;
 		this.y = y;
 	}
 	
-	// doubles will be rounded
-	Coordinate(double x, double y)
-	{
-		this.x = (int)Math.round(x);
-		this.y = (int)Math.round(x);
-	}
 	
-	Coordinate(double x, int y)
+	public Coordinate(int x, double y)
 	{
-		this.x = (int)Math.round(x);
+		this.x = x;
 		this.y = y;
 	}
 	
-	Coordinate(int x, double y)
+	
+	public Coordinate(double x, int y)
 	{
 		this.x = x;
-		this.y = (int)Math.round(x);
+		this.y = y;
+	}
+	
+	
+	public Coordinate(double x, double y)
+	{
+		this.x = x;
+		this.y = y;
+	}
+	
+	public void setCoordinates(double x, double y)
+	{
+		this.x = x;
+		this.y = y;
+	}
+	
+	
+	public void print()
+	{
+		System.out.println("("+this.x+","+this.y+")");
+	}
+	
+	public Coordinate clone()
+	{
+		return new Coordinate(this.x, this.y);
+	}
+	
+	
+	
+	public int xAsInt()
+	{
+		return (int) Math.round(this.x);
+	}
+	
+	public int yAsInt()
+	{
+		return (int) Math.round(this.y);
 	}
 }

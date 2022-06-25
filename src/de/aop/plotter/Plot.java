@@ -13,14 +13,16 @@ import java.util.List;
 
 import javax.swing.*;
 
+import de.aop.parser.Parser;
+
 public class Plot extends JPanel
 {
-	private static final int[] data = {1,2,3,4,5,6,7,8,9,29}; //ToDo: replace with plot stuff
 	private static final int X_SCALE_MARKERS = 10; // Amount of markers going from middle to top and bottom each
 	private static final int Y_SCALE_MARKERS = 10; // Amount of markers going from middle to left and right each
+	private Parser data;
 	private int markerGap;
-	private static final Stroke GRAPH_STROKE = new BasicStroke(3f); //Nur bei extrempunkten?
 	private Coordinate middle;
+	double scale = 2; // probably only visual :D
 	
 	/**
 	 * 
@@ -55,11 +57,12 @@ public class Plot extends JPanel
 	    
 	    // Draw x- and y-axis 
 	    g2.setColor(Color.black);
-	    g2.drawLine(middle.x, 0, middle.x, getHeight());
-	    g2.drawLine(0, middle.y, getWidth(), middle.y);
+	    g2.drawLine(middle.xAsInt(), 0, middle.xAsInt(), getHeight());
+	    g2.drawLine(0, middle.yAsInt(), getWidth(), middle.yAsInt());
 	    
-
-	    
+	    if (data != null) {
+	    	drawFunction(g2);
+	    }
 	    
 	    // TODO Anhand der Extrempunkte usw. feststellen welcher Teil des Graphen überhaupt interessant ist.
 	    
@@ -136,7 +139,6 @@ public class Plot extends JPanel
 		{
 			foundGap++;
 		}
-		System.out.println("Found Gap!: "+foundGap);
 		return foundGap;	
 	}
 	
@@ -147,7 +149,7 @@ public class Plot extends JPanel
 	private void drawSecondaryLines(Graphics2D g)
 	{
 		// X-Axis additions
-		int currentPosition = middle.y;
+		int currentPosition = middle.yAsInt();
 		g.setColor(Color.lightGray);
 		
 		// middle -> y=MAX
@@ -155,20 +157,20 @@ public class Plot extends JPanel
 		{
 			g.drawLine(0, currentPosition+this.markerGap, getWidth(), currentPosition+this.markerGap);
 			currentPosition += this.markerGap;
-			System.out.println("CurrentPosition y->MAX: "+currentPosition+", "+this.markerGap);			
+			// DEBUG System.out.println("CurrentPosition y->MAX: "+currentPosition+", "+this.markerGap);			
 		}
 		
-		currentPosition = middle.y;
+		currentPosition = middle.yAsInt();
 		// middle -> y=0
 		while (currentPosition - markerGap > 0)
 		{
 			g.drawLine(0, currentPosition-markerGap, getWidth(), currentPosition-markerGap);
 			currentPosition -= markerGap;
-			System.out.println("CurrentPosition y->0: "+currentPosition);
+			// DEBUG System.out.println("CurrentPosition y->0: "+currentPosition);
 		}
 		
 		// Y-Axis additions
-		currentPosition = middle.x;
+		currentPosition = middle.xAsInt();
 		g.setColor(Color.lightGray);
 		
 		// middle -> x=MAX
@@ -176,20 +178,96 @@ public class Plot extends JPanel
 		{
 			g.drawLine(currentPosition+this.markerGap, 0, currentPosition+this.markerGap, getHeight());
 			currentPosition += this.markerGap;
-			System.out.println("CurrentPosition x->MAX: "+currentPosition+", "+this.markerGap);			
+			// DEBUG System.out.println("CurrentPosition x->MAX: "+currentPosition+", "+this.markerGap);			
 		}
 		
-		currentPosition = middle.x;
+		currentPosition = middle.xAsInt();
 		// middle -> x=0
 		while (currentPosition - this.markerGap > 0)
 		{
 			g.drawLine(currentPosition-this.markerGap, 0, currentPosition-this.markerGap, getHeight());
 			currentPosition -= this.markerGap;
-			System.out.println("CurrentPosition x->0: "+currentPosition+", "+this.markerGap);			
+			// DEBUG System.out.println("CurrentPosition x->0: "+currentPosition+", "+this.markerGap);			
 		}
 		
 	}
 	
 	
-	// Convert coordinate to 
+	// real number to pixel position (0,0) -> (middle.x,middle.y)
+	public Coordinate functionToPixel(double x, double y)
+	{
+		Coordinate result = new Coordinate(0,0);
+		
+		result.x = x * this.markerGap * scale + this.middle.x;
+		result.y = y * (-1) *this.markerGap * scale + this.middle.y ; 
+		
+		return result; 
+	}
+	
+	
+	// convert pixel position to real numbers
+	private Coordinate pixelToFunction(double x, double y)
+	{
+		Coordinate result = new Coordinate(0,0);
+		
+		result.x = (x - this.middle.x) / this.markerGap;
+		result.y = (y - this.middle.y) / this.markerGap * (-1);
+		
+		return result;
+	}
+	
+	
+	// Drawing the function on top of the canvas
+	private void drawFunction(Graphics2D g)
+	{
+		g.setColor(Color.red);
+		g.setStroke(new BasicStroke(2f));
+		
+		
+		int width = getWidth();
+		int xPixel = 0; // iterator from left to right of visible canvas
+		double xReal = 0; // x as Real number for function to use
+		boolean firstRun = true;
+		
+		Coordinate currentPoint = new Coordinate(0,0);
+		Coordinate previousPoint = new Coordinate(0,0);
+		
+		
+		while (xPixel <= width)
+		{
+			xReal = pixelToFunction(xPixel, 0).x;
+			currentPoint.setCoordinates(xReal, data.eval(xReal));
+			currentPoint.print();
+			currentPoint = functionToPixel(currentPoint.x, currentPoint.y);
+		
+			if (firstRun)
+			{
+				previousPoint = currentPoint.clone();
+				firstRun = false;
+			}
+			
+			if (currentPoint.y < getHeight() * 1.2 && currentPoint.y > -getHeight()*0.2)
+			{
+				currentPoint.print();
+				previousPoint.print();
+				
+				g.drawLine(previousPoint.xAsInt(), previousPoint.yAsInt(), currentPoint.xAsInt(), currentPoint.yAsInt());
+				previousPoint = currentPoint.clone();
+				
+				currentPoint.print();
+				previousPoint.print();
+				
+			}
+			xPixel++;
+			System.out.println("====================");
+		}
+	}
+	
+	
+	// test function
+	public void setData(Parser data)
+	{
+		this.data = data;
+	}
+	
 }

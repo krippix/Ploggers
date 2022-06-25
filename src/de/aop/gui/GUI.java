@@ -1,5 +1,7 @@
 package de.aop.gui;
 
+import de.aop.exceptions.SyntaxError;
+import de.aop.parser.Parser;
 import de.aop.plotter.*;
 
 import javax.swing.*;
@@ -19,7 +21,7 @@ public class GUI extends JFrame
 	JPanel basePanel;
 	JPanel menuPanel;
 	JPanel infoPanel;
-	JPanel contentPanel;
+	Plot contentPanel;
 	JTextField functionInput;
 	JButton buttonGenerate;
 	Image graph;
@@ -110,7 +112,6 @@ public class GUI extends JFrame
 		// Content panel
 		this.contentPanel = new Plot();
 		this.contentPanel.setBackground(Color.white);
-		this.contentPanel.setMinimumSize(new Dimension(2000,2000));
 		
 		this.basePanel.add(this.contentPanel, BorderLayout.CENTER);
 
@@ -141,11 +142,19 @@ public class GUI extends JFrame
 	
 	private void generatePlot()
 	{
-		System.out.println("Totally Printing out a plot now :D");
-		int height = this.contentPanel.getBounds().height;
-		int width = this.contentPanel.getBounds().width;
+		Parser function;
+		try
+		{
+			function = new Parser(this.functionInput.getText());
+		}
+		catch (SyntaxError e)
+		{
+			System.out.println(e);
+			return;
+		}
 		
-		//this.graph = 
+		this.contentPanel.setData(function);
+		this.contentPanel.repaint();
 		
 	}
 }
