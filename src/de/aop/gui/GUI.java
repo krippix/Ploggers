@@ -142,14 +142,11 @@ public class GUI extends JFrame
 	
 	private void generatePlot()
 	{
-		Parser function;
-		try
+		Parser function = new Parser(this.functionInput.getText());
+		if(!function.good())
 		{
-			function = new Parser(this.functionInput.getText());
-		}
-		catch (SyntaxError e)
-		{
-			System.out.println(e);
+			// TODO: Display Error in GUI
+			System.err.println(function.getError().toString());
 			return;
 		}
 		
