@@ -15,27 +15,28 @@ import javax.swing.*;
 
 public class Plot extends JPanel
 {
-	private static final int BORDER_GAP = 30;
-	private static final int MAX_SCORE = 20;
 	private static final int[] data = {1,2,3,4,5,6,7,8,9,29}; //ToDo: replace with plot stuff
-	private static final int Y_HATCH_CNT = 10; // Remove this (or more pRäZisE)
-	private static final int GRAPH_POINT_WIDTH = 0; //Nur bei extrempunkten?
+	private static final int X_SCALE_MARKERS = 10; // Amount of markers going from middle to top and bottom each
+	private static final int Y_SCALE_MARKERS = 10; // Amount of markers going from middle to left and right each
+	private int markerGap;
 	private static final Stroke GRAPH_STROKE = new BasicStroke(3f); //Nur bei extrempunkten?
+	private Coordinate middle;
 	
-	// Constructor
+	/**
+	 * 
+	 */
 	public Plot()
 	{
 		// ToDo, Roberts dateityp entgegenehmen, oder in anderer Klasse die wichtigen Punkte berechnen
 		// Klasse dafür wird vermutlich Graph, in der sollen dann die Wichtigen Punkte und der Parse abgelegt werden.
-	}
+	}	
 	
-	public JPanel drawGraph()
-	{
-		JPanel graph = new JPanel();
-		graph.add(this);
-		return graph;
-	}
 	
+
+		
+	/**
+	 * This is handling all drawing an is called when needed by swing
+	 */
 	@Override
 	protected void paintComponent(Graphics g)
 	{
@@ -43,64 +44,152 @@ public class Plot extends JPanel
 		Graphics2D g2 = (Graphics2D)g;
 	    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	    
-	    // check what this is even doing
-	    double xScale = ((double) getWidth() - 2 * BORDER_GAP) / (this.data.length - 1);
-	    double yScale = ((double) getHeight() - 2 * BORDER_GAP) / (MAX_SCORE - 1);
+	    // Sets x and yMiddle to usable ints
+	    calcCanvasMiddle();
 	    
-	    List<Point> graphPoints = new ArrayList<Point>();
-	    for (int i = 0; i < data.length; i++) 
-	    {
-	         int x1 = (int) (i * xScale + BORDER_GAP);
-	         int y1 = (int) ((MAX_SCORE - data[i]) * yScale + BORDER_GAP);
-	         graphPoints.add(new Point(x1, y1));
-	    }
+	    // Calculate biggest marker gap that keeps the graph intact
+	    calcMarkerGap();
 	    
-	    // THE INTERESTING PART !!
-	    g2.drawLine(BORDER_GAP, getHeight() - BORDER_GAP, BORDER_GAP, BORDER_GAP);
-	    g2.drawLine(BORDER_GAP, getHeight() - BORDER_GAP, getWidth() - BORDER_GAP, getHeight() - BORDER_GAP);
+	    // Draw x- and y-axis helper lines
+	    drawSecondaryLines(g2);
 	    
-	    // create hatch marks for y axis. Seitenbeschrf?
-	    for (int i = 0; i < Y_HATCH_CNT; i++)
-	    {
-	    	int x0 = BORDER_GAP;
-	    	int x1 = GRAPH_POINT_WIDTH + BORDER_GAP;
-	    	int y0 = getHeight() - (((i + 1) * (getHeight() - BORDER_GAP * 2)) / Y_HATCH_CNT + BORDER_GAP);
-	    	int y1 = y0;
-	    	g2.drawLine(x0, y0, x1, y1);
-	    }
+	    // Draw x- and y-axis 
+	    g2.setColor(Color.black);
+	    g2.drawLine(middle.x, 0, middle.x, getHeight());
+	    g2.drawLine(0, middle.y, getWidth(), middle.y);
 	    
-	    // x-lass ich mal als test weg
-	    
-	    Stroke oldStroke = g2.getStroke();
-	      g2.setColor(Color.red);
-	      g2.setStroke(GRAPH_STROKE);
-	      for (int i = 0; i < graphPoints.size() - 1; i++) {
-	         int x1 = graphPoints.get(i).x;
-	         int y1 = graphPoints.get(i).y;
-	         int x2 = graphPoints.get(i + 1).x;
-	         int y2 = graphPoints.get(i + 1).y;
-	         g2.drawLine(x1, y1, x2, y2);         
-	      }
-	      
-	      g2.setStroke(oldStroke);      
-	      g2.setColor(Color.black);
-	      for (int i = 0; i < graphPoints.size(); i++) {
-	         int x = graphPoints.get(i).x - GRAPH_POINT_WIDTH / 2;
-	         int y = graphPoints.get(i).y - GRAPH_POINT_WIDTH / 2;;
-	         int ovalW = GRAPH_POINT_WIDTH;
-	         int ovalH = GRAPH_POINT_WIDTH;
-	         g2.fillOval(x, y, ovalW, ovalH);
-	      }
-	      
 
+	    
+	    
+	    // TODO Anhand der Extrempunkte usw. feststellen welcher Teil des Graphen überhaupt interessant ist.
+	    
 	}
     
+	
+	/**
+	 * This function determines the canvas size for the drawing
+	 */
 	@Override
     public Dimension getPreferredSize()
 	{
-       return new Dimension(500, 500);
+       return new Dimension(601, 601);
     }
 	
 	
 	
+	/**
+	 * This function calculates the canvas middle and writes it to this.middle
+	 */
+	private void calcCanvasMiddle() {
+		this.middle = new Coordinate(determineMiddle(getWidth()),determineMiddle(getHeight()));
+	}
+	
+	
+	/**
+	 * Helper function for calcCanvasMiddle doing the calculation
+	 * @param size to find middle from
+	 * @return returns middle
+	 */
+	private int determineMiddle(int size)
+	{
+		if (size % 2 == 0)
+		{
+			return size/2;
+		}
+		else
+		{
+			return (size - 1)/2 +1;
+		}
+	}
+	
+	
+	/**
+	 * Returns scale that allows for all scale markers, while keeping the scale of x and y equal
+	 */
+	private void calcMarkerGap()
+	{
+		// TODO: This could fail if the canvas is too small or there are too many markers
+		int xAvailableSpace = getWidth()/2;
+		int yAvailableSpace = getHeight()/2;
+		int xGap = 0;
+		int yGap = 0;
+
+		// Calculate biggest possible gap between each line
+		xGap = calculateGap(xAvailableSpace, X_SCALE_MARKERS);
+		yGap = calculateGap(yAvailableSpace, Y_SCALE_MARKERS);
+		
+		this.markerGap = Math.min(xGap, yGap);
+	}
+	
+	
+	/**
+	 * Helper function for calcMarkerGap()
+	 * @param space available pixels
+	 * @param markers amount of used markers
+	 * @return determined gap
+	 */
+	private int calculateGap(int space, int markers)
+	{
+		int foundGap = 1;
+		
+		while ((foundGap+1)*markers < space)
+		{
+			foundGap++;
+		}
+		System.out.println("Found Gap!: "+foundGap);
+		return foundGap;	
+	}
+	
+	
+	/**
+	 * @param Graphics object to wich lines are drawn
+	 */
+	private void drawSecondaryLines(Graphics2D g)
+	{
+		// X-Axis additions
+		int currentPosition = middle.y;
+		g.setColor(Color.lightGray);
+		
+		// middle -> y=MAX
+		while (currentPosition + this.markerGap < getHeight())
+		{
+			g.drawLine(0, currentPosition+this.markerGap, getWidth(), currentPosition+this.markerGap);
+			currentPosition += this.markerGap;
+			System.out.println("CurrentPosition y->MAX: "+currentPosition+", "+this.markerGap);			
+		}
+		
+		currentPosition = middle.y;
+		// middle -> y=0
+		while (currentPosition - markerGap > 0)
+		{
+			g.drawLine(0, currentPosition-markerGap, getWidth(), currentPosition-markerGap);
+			currentPosition -= markerGap;
+			System.out.println("CurrentPosition y->0: "+currentPosition);
+		}
+		
+		// Y-Axis additions
+		currentPosition = middle.x;
+		g.setColor(Color.lightGray);
+		
+		// middle -> x=MAX
+		while (currentPosition + this.markerGap < getWidth())
+		{
+			g.drawLine(currentPosition+this.markerGap, 0, currentPosition+this.markerGap, getHeight());
+			currentPosition += this.markerGap;
+			System.out.println("CurrentPosition x->MAX: "+currentPosition+", "+this.markerGap);			
+		}
+		
+		currentPosition = middle.x;
+		// middle -> x=0
+		while (currentPosition - this.markerGap > 0)
+		{
+			g.drawLine(currentPosition-this.markerGap, 0, currentPosition-this.markerGap, getHeight());
+			currentPosition -= this.markerGap;
+			System.out.println("CurrentPosition x->0: "+currentPosition+", "+this.markerGap);			
+		}
+		
+	}
+	
+	
+	// Convert coordinate to 
 }
