@@ -22,7 +22,7 @@ public class Plot extends JPanel
 	private Parser data;
 	private int markerGap;
 	private Coordinate middle;
-	double scale = 2; // probably only visual :D
+	double scale = 4; // probably only visual :D
 	
 	/**
 	 * 
@@ -237,7 +237,6 @@ public class Plot extends JPanel
 		{
 			xReal = pixelToFunction(xPixel, 0).x;
 			currentPoint.setCoordinates(xReal, data.eval(xReal));
-			currentPoint.print();
 			currentPoint = functionToPixel(currentPoint.x, currentPoint.y);
 		
 			if (firstRun)
@@ -248,18 +247,10 @@ public class Plot extends JPanel
 			
 			if (currentPoint.y < getHeight() * 1.2 && currentPoint.y > -getHeight()*0.2)
 			{
-				currentPoint.print();
-				previousPoint.print();
-				
 				g.drawLine(previousPoint.xAsInt(), previousPoint.yAsInt(), currentPoint.xAsInt(), currentPoint.yAsInt());
 				previousPoint = currentPoint.clone();
-				
-				currentPoint.print();
-				previousPoint.print();
-				
 			}
 			xPixel++;
-			System.out.println("====================");
 		}
 	}
 	
