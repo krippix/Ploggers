@@ -1,13 +1,13 @@
-package de.aop.parser.expressions;
+package de.aop.parser.nodes;
 
-public abstract class IToken 
+public abstract class INode 
 {
-	protected IToken left, right;
+	protected INode left, right;
 	protected int position;
 	
 	public abstract double eval(double x);
 	
-	public IToken optimize()
+	public INode optimize()
 	{
 		if(this instanceof Identifier)
 			return this;

@@ -1,13 +1,13 @@
-package de.aop.parser.expressions;
+package de.aop.parser.nodes;
 
 import de.aop.exceptions.SyntaxError;
 import de.aop.parser.ParseString;
 
-public class Exponential extends Atom
+public class Sine extends Atom
 {
-	Exponential(ParseString input) throws SyntaxError
+	Sine(ParseString input) throws SyntaxError
 	{
-		input.next(); input.next(); input.next();	// Flush exp
+		input.next(); input.next(); input.next();	// Flush sin
 		
 		input.next();
 		this.left = Expression.getNextToken(input);
@@ -20,7 +20,7 @@ public class Exponential extends Atom
 	@Override
 	public double eval(double x)
 	{
-		return Math.exp(this.left.eval(x));
+		return Math.sin(this.left.eval(x));
 	}
 
 }

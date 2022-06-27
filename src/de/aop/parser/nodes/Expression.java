@@ -1,13 +1,13 @@
-package de.aop.parser.expressions;
+package de.aop.parser.nodes;
 
 import de.aop.exceptions.SyntaxError;
 import de.aop.parser.ParseString;
 
-public abstract class Expression extends IToken
+public abstract class Expression extends INode
 {
-	public static IToken getNextToken(ParseString input) throws SyntaxError
+	public static INode getNextToken(ParseString input) throws SyntaxError
 	{
-		IToken nextToken = Term.getNextToken(input);
+		INode nextToken = Term.getNextToken(input);
 		
 		switch(input.getCurrentToken())
 		{
