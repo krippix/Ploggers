@@ -3,6 +3,7 @@ package de.aop.plotter;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -17,19 +18,22 @@ import de.aop.parser.Parser;
 
 public class Plot extends JPanel
 {
-	private static final int X_SCALE_MARKERS = 10; // Amount of markers going from middle to top and bottom each
-	private static final int Y_SCALE_MARKERS = 10; // Amount of markers going from middle to left and right each
+	private static final int X_SCALE_MARKERS_MIN = 10; // Minimum amount of markers going from middle to top and bottom each
+	private static final int Y_SCALE_MARKERS_MIN = 10; // Minimum amount of markers going from middle to left and right each
+	private int xScaleMarkers = 0; // actual number of scale markers
+	private int yScaleMarkers = 0; // actual number of scale markers
 	private Parser data;
 	private int markerGap;
 	private Coordinate middle;
 
-	double scale = 2; // probably only visual :D
+	double scale = 4; // probably only visual :D
 	
 	/**
 	 * 
 	 */
 	public Plot()
 	{
+		getLabel(2);
 		// ToDo, Roberts dateityp entgegenehmen, oder in anderer Klasse die wichtigen Punkte berechnen
 		// Klasse dafür wird vermutlich Graph, in der sollen dann die Wichtigen Punkte und der Parse abgelegt werden.
 	}	
@@ -47,6 +51,8 @@ public class Plot extends JPanel
 		Graphics2D g2 = (Graphics2D)g;
 	    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	    
+	    
+	    
 	    // Sets x and yMiddle to usable ints
 	    calcCanvasMiddle();
 	    
@@ -57,16 +63,19 @@ public class Plot extends JPanel
 	    drawSecondaryLines(g2);
 	    
 	    // Draw x- and y-axis 
-	    g2.setColor(Color.black);
-	    g2.drawLine(middle.xAsInt(), 0, middle.xAsInt(), getHeight());
-	    g2.drawLine(0, middle.yAsInt(), getWidth(), middle.yAsInt());
+	    drawAxis(g2);
+	    
+	    // Draw numbers on x- and y-axis
+	    drawPlotNumbering(g2);
+	    
 	    
 	    if (data != null) {
 	    	drawFunction(g2);
 	    }
 	    
-	    // TODO Anhand der Extrempunkte usw. feststellen welcher Teil des Graphen überhaupt interessant ist.
 	    
+	    // TODO Anhand der Extrempunkte usw. feststellen welcher Teil des Graphen überhaupt interessant ist.
+	    //System.out.println("Result: "+getLabel(-1.4123));
 	}
     
 	
@@ -119,8 +128,8 @@ public class Plot extends JPanel
 		int yGap = 0;
 
 		// Calculate biggest possible gap between each line
-		xGap = calculateGap(xAvailableSpace, X_SCALE_MARKERS);
-		yGap = calculateGap(yAvailableSpace, Y_SCALE_MARKERS);
+		xGap = calculateGap(xAvailableSpace, X_SCALE_MARKERS_MIN);
+		yGap = calculateGap(yAvailableSpace, Y_SCALE_MARKERS_MIN);
 		
 		this.markerGap = Math.min(xGap, yGap);
 	}
@@ -158,6 +167,7 @@ public class Plot extends JPanel
 		{
 			g.drawLine(0, currentPosition+this.markerGap, getWidth(), currentPosition+this.markerGap);
 			currentPosition += this.markerGap;
+			this.yScaleMarkers++;
 			// DEBUG System.out.println("CurrentPosition y->MAX: "+currentPosition+", "+this.markerGap);			
 		}
 		
@@ -179,6 +189,7 @@ public class Plot extends JPanel
 		{
 			g.drawLine(currentPosition+this.markerGap, 0, currentPosition+this.markerGap, getHeight());
 			currentPosition += this.markerGap;
+			this.xScaleMarkers++;
 			// DEBUG System.out.println("CurrentPosition x->MAX: "+currentPosition+", "+this.markerGap);			
 		}
 		
@@ -191,6 +202,29 @@ public class Plot extends JPanel
 			// DEBUG System.out.println("CurrentPosition x->0: "+currentPosition+", "+this.markerGap);			
 		}
 		
+	}
+	
+	/**
+	 * Adds axis labels to Graph
+	 * @param graphics object to draw on
+	 */
+	private void drawAxis(Graphics2D g)
+	{
+		FontMetrics metrics = g.getFontMetrics();
+		
+		// Just drawing black lines
+		g.setColor(Color.black);
+	    g.drawLine(middle.xAsInt(), 0, middle.xAsInt(), getHeight());
+	    g.drawLine(0, middle.yAsInt(), getWidth(), middle.yAsInt());
+	    
+	    // Draw Arrows and x,y
+	    g.drawString("x", getWidth()-metrics.stringWidth("x")-6, middle.yAsInt()-6);
+	    g.drawLine(getWidth(), middle.yAsInt(), getWidth()-4, middle.yAsInt()-4);
+	    g.drawLine(getWidth(), middle.yAsInt(), getWidth()-4, middle.yAsInt()+4);
+	    
+	    g.drawString("y", middle.xAsInt()+6, metrics.getHeight());
+	    g.drawLine(middle.xAsInt(), 0, middle.xAsInt()+4, 4);
+	    g.drawLine(middle.xAsInt(), 0, middle.xAsInt()-4, 4);
 	}
 	
 	
@@ -211,8 +245,8 @@ public class Plot extends JPanel
 	{
 		Coordinate result = new Coordinate(0,0);
 		
-		result.x = (x - this.middle.x) / this.markerGap;
-		result.y = (y - this.middle.y) / this.markerGap * (-1);
+		result.x = (x - this.middle.x) / (this.markerGap * scale);
+		result.y = (y - this.middle.y) / (this.markerGap * scale) * (-1);
 		
 		return result;
 	}
@@ -254,6 +288,107 @@ public class Plot extends JPanel
 			xPixel++;
 		}
 	}
+	
+	/**
+	 * Draws numbers on x- and y-axis for scale
+	 * More details about the mesurement: https://docs.oracle.com/javase/tutorial/2d/text/measuringtext.html
+	 * @param the plot graphics object
+	 */
+	private void drawPlotNumbering(Graphics2D g)
+	{
+		// object to get info about strings, other variables
+		FontMetrics metrics = g.getFontMetrics();
+		String label = "";
+		int offset = -2;
+		int offset2 = 0; // used for all but '0'
+		int xPos = 0;
+		int yPos = 0;
+		
+		// place 0 at origin
+		label = "0";
+		xPos = (middle.xAsInt()-metrics.stringWidth("0"));
+		yPos = (middle.yAsInt()+metrics.getHeight());
+		g.drawString(label, xPos+offset, yPos+offset);
+		
+		// draw the rest of the numbers
+		// x-axis
+		for (int i=2; i < xScaleMarkers/2 - 1; i+=2)
+		{
+			// Positive numbers
+			xPos = (i * this.markerGap) + middle.xAsInt();
+			label = getLabel(pixelToFunction(xPos,0).x);
+			offset2 = -(metrics.stringWidth(label)/2);
+			g.drawString(label, xPos+offset+offset2, yPos+offset);
+			
+			// Negative numbers
+			xPos = -(i * this.markerGap) + middle.xAsInt();
+			label = getLabel(pixelToFunction(xPos,0).x);
+			offset2 = -(metrics.stringWidth(label)/2);
+			g.drawString(label, xPos+offset+offset2, yPos+offset);
+		}
+		
+		//y-axis
+		xPos = this.middle.xAsInt();
+		offset = -4;
+		for (int i=2; i < yScaleMarkers/2 - 1; i+=2)
+		{
+			// Positive numbers
+			yPos = (i * this.markerGap) + middle.yAsInt();
+			label = getLabel(pixelToFunction(0,yPos).y);
+			offset2 = -(metrics.stringWidth(label));
+			g.drawString(label, xPos+offset+offset2, yPos-offset);
+			
+			// Negative numbers
+			yPos = -(i * this.markerGap) + middle.yAsInt();
+			label = getLabel(pixelToFunction(0,yPos).y);
+			offset2 = -(metrics.stringWidth(label));
+			g.drawString(label, xPos+offset+offset2, yPos-offset);
+		}
+		
+	}
+	
+	/**
+	 * Takes Double and returns fitting label for x/y-axis
+	 * @param number
+	 * @return Number String as int or double with two decimals
+	 */
+	private String getLabel(double number)
+	{
+		String str_number = Double.toString(number);
+		System.out.println(str_number);
+		String[] str_part = str_number.split("\\.");
+		boolean isNegative = false;
+		
+		if (str_part[0].charAt(0) == '-')
+		{
+			isNegative = true;
+			str_part[0] = str_part[0].substring(1);
+		}
+		
+		// Check if first decimal is not 0
+		if (str_part[1].charAt(0) == '0')
+		{
+			str_number = str_part[0];
+		}
+		else
+		{
+			str_number = str_part[0]+"."+str_part[1].substring(0,1);
+		}
+	
+				
+		System.out.println("Label result: "+str_number);
+		
+		// Re-Add '-' if removed earlier
+		if (isNegative)
+		{
+			return "-"+str_number;
+		}
+		else
+		{
+			return str_number;
+		}
+	}
+	
 	
 	
 	// test function
