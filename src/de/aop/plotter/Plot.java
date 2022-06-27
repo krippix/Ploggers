@@ -14,15 +14,15 @@ import java.util.List;
 
 import javax.swing.*;
 
+import de.aop.parser.Function;
 import de.aop.parser.Parser;
 
 public class Plot extends JPanel
 {
-	private static final int X_SCALE_MARKERS_MIN = 10; // Minimum amount of markers going from middle to top and bottom each
-	private static final int Y_SCALE_MARKERS_MIN = 10; // Minimum amount of markers going from middle to left and right each
-	private int xScaleMarkers = 0; // actual number of scale markers
-	private int yScaleMarkers = 0; // actual number of scale markers
-	private Parser data;
+
+	private static final int X_SCALE_MARKERS = 10; // Amount of markers going from middle to top and bottom each
+	private static final int Y_SCALE_MARKERS = 10; // Amount of markers going from middle to left and right each
+	private Function data;
 	private int markerGap;
 	private Coordinate middle;
 
@@ -271,7 +271,7 @@ public class Plot extends JPanel
 		while (xPixel <= width)
 		{
 			xReal = pixelToFunction(xPixel, 0).x;
-			currentPoint.setCoordinates(xReal, data.eval(xReal));
+			currentPoint.setCoordinates(xReal, data.at(xReal));
 			currentPoint = functionToPixel(currentPoint.x, currentPoint.y);
 		
 			if (firstRun)
@@ -392,7 +392,7 @@ public class Plot extends JPanel
 	
 	
 	// test function
-	public void setData(Parser data)
+	public void setData(Function data)
 	{
 		this.data = data;
 	}
