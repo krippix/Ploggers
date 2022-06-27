@@ -5,10 +5,12 @@ import de.aop.parser.ParseString;
 
 public class Addition extends Expression
 {
-	public Addition(ParseString input, INode left) throws SyntaxError
+	public Addition(ParseString input, INode left, boolean dontSkip) throws SyntaxError
 	{
 		this.left = left;
-		input.next();
+		
+		if(!dontSkip)
+			input.next();
 		
 		this.right = Expression.getNextToken(input);
 	}

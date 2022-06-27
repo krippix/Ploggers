@@ -12,11 +12,11 @@ public abstract class Expression extends INode
 		switch(input.getCurrentToken())
 		{
 		case '+':
-			nextToken = new Addition(input, nextToken);
+			nextToken = new Addition(input, nextToken, false);
 			break;
 			
 		case '-':
-			nextToken = new Subtraction(input, nextToken);
+			nextToken = new Addition(input, nextToken, true);
 			break;
 			
 		case '\0':
