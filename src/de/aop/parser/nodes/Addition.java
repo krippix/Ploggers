@@ -7,7 +7,6 @@ public class Addition extends Expression
 {
 	public Addition(ParseString input, INode left) throws SyntaxError
 	{
-		this.position = input.getPos();
 		this.left = left;
 		input.next();
 		
