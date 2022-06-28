@@ -146,6 +146,11 @@ public class Function
 		return range;
 	}
 	
+	private boolean signsDifferent(double a, double b)
+	{
+		return Math.signum(a) != Math.signum(b) && Math.abs(b - a) > ERROR_SCALE;
+	}
+	
 	/**
 	 * Finds all roots of the n-th derivative of the function on an interval.
 	 * The algorithm used is the bisection algorithm
@@ -161,11 +166,11 @@ public class Function
 		// enlarges it until the conditions for bisection are satisfied
 		Interval searchInterval = new Interval(interval.min, interval.min);
 		double stepSize = 0.001 * interval.length();
-		while(searchInterval.max <= interval.max && Math.signum(this.at(searchInterval.min, n)) == Math.signum(this.at(searchInterval.max, n)))
+		while (searchInterval.max <= interval.max && !signsDifferent(this.at(searchInterval.min, n), this.at(searchInterval.max, n)))
 			searchInterval.max += stepSize;
-		
+			
 		// If the search interval is larger than the given interval, abort; there are no roots on this interval
-		if(searchInterval.max >= interval.max || Math.signum(this.at(searchInterval.min, n)) == Math.signum(this.at(searchInterval.max, n)))
+		if(searchInterval.max > interval.max || !signsDifferent(this.at(searchInterval.min, n), this.at(searchInterval.max, n)))
 			return;
 		
 		// Find all roots on the remaining interval
@@ -224,10 +229,10 @@ public class Function
 	{
 		Interval searchInterval = new Interval(interval.min, interval.min);
 		double stepSize = 0.001 * interval.length();
-		while(searchInterval.max <= interval.max && Math.signum(this.inverseAt(searchInterval.min)) == Math.signum(this.inverseAt(searchInterval.max)))
+		while(searchInterval.max <= interval.max && !signsDifferent(this.inverseAt(searchInterval.min), this.inverseAt(searchInterval.max)))
 			searchInterval.max += stepSize;
 		
-		if(searchInterval.max >= interval.max || Math.signum(this.inverseAt(searchInterval.min)) == Math.signum(this.inverseAt(searchInterval.max)))
+		if(searchInterval.max >= interval.max || !signsDifferent(this.inverseAt(searchInterval.min), this.inverseAt(searchInterval.max)))
 			return;
 		
 		findPoles(new Interval(searchInterval.max, interval.max));
