@@ -1,4 +1,5 @@
 package de.aop.plotter;
+import de.aop.parser.Function;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -6,15 +7,9 @@ import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.Stroke;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.swing.*;
 
-import de.aop.parser.Parser;
 
 public class Plot extends JPanel
 {
@@ -22,7 +17,7 @@ public class Plot extends JPanel
 	private static final int Y_SCALE_MARKERS_MIN = 10; // Minimum amount of markers going from middle to left and right each
 	private int xScaleMarkers = 0; // actual number of scale markers
 	private int yScaleMarkers = 0; // actual number of scale markers
-	private Parser data;
+	private Function data;
 	private int markerGap;
 	private Coordinate middle;
 
@@ -271,7 +266,7 @@ public class Plot extends JPanel
 		while (xPixel <= width)
 		{
 			xReal = pixelToFunction(xPixel, 0).x;
-			currentPoint.setCoordinates(xReal, data.eval(xReal));
+			currentPoint.setCoordinates(xReal, data.at(xReal));
 			currentPoint = functionToPixel(currentPoint.x, currentPoint.y);
 		
 			if (firstRun)
@@ -438,13 +433,13 @@ public class Plot extends JPanel
 		repaint();
 		System.out.println("Scale is "+this.scale.y);
 	}
-	
+
 	
 	/**
 	 * Sets data that will be used for drawing the graph
 	 * @param data
 	 */
-	public void setData(Parser data)
+	public void setData(Function data)
 	{
 		this.data = data;
 	}

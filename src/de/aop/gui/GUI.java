@@ -1,5 +1,7 @@
 package de.aop.gui;
 
+import de.aop.exceptions.SyntaxError;
+import de.aop.parser.Function;
 import de.aop.parser.Parser;
 import de.aop.plotter.*;
 
@@ -140,11 +142,11 @@ public class GUI extends JFrame
 	
 	private void generatePlot()
 	{
-		Parser function = new Parser(this.functionInput.getText());
-		if(!function.good())
+		Function function = new Function(this.functionInput.getText(), -5.0, 5.0);
+		if(!function.isValid())
 		{
 			// TODO: Display Error in GUI
-			System.err.println(function.getError().toString());
+			System.err.println(function.getSyntaxError().toString());
 			return;
 		}
 		
