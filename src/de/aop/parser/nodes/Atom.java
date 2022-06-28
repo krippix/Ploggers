@@ -1,13 +1,13 @@
-package de.aop.parser.expressions;
+package de.aop.parser.nodes;
 
 import de.aop.exceptions.SyntaxError;
 import de.aop.parser.ParseString;
 
-public abstract class Atom extends IToken
+public abstract class Atom extends INode
 {
-	static IToken getNextToken(ParseString input) throws SyntaxError
+	static INode getNextToken(ParseString input) throws SyntaxError
 	{
-		IToken nextToken = null;
+		INode nextToken = null;
 		
 		switch(input.getCurrentToken())
 		{

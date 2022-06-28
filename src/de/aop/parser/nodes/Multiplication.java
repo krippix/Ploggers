@@ -1,11 +1,11 @@
-package de.aop.parser.expressions;
+package de.aop.parser.nodes;
 
 import de.aop.exceptions.SyntaxError;
 import de.aop.parser.ParseString;
 
 public class Multiplication extends Expression
 {
-	public Multiplication(ParseString input, IToken left) throws SyntaxError
+	public Multiplication(ParseString input, INode left) throws SyntaxError
 	{
 		this.left = left;
 		input.next();
