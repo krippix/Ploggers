@@ -144,53 +144,67 @@ public class Function
 		return range;
 	}
 	
+	/**
+	 * Finds all roots of the n-th derivative of the function on an interval.
+	 * The algorithm used is the bisection algorithm
+	 * 
+	 * @param dest Array to hold the found roots
+	 * @param interval Interval to search for roots
+	 * @param n Derivative to inspect
+	 */
 	private void findRoots(ArrayList<Double> dest, Interval interval, int n)
 	{
+		// Hardcoded bounds and errors
+		// TODO: Don't hardcode them, they should adjust with the size of the interval
 		final int MAX_ITERATIONS = 100;
 		final double MAX_ERROR = 0.000001;
 		
+		// Find the interval this function should search.
+		// It starts with the smallest possible interval and then incrementally
+		// enlarges it until the conditions for bisection are satisfied
 		Interval searchInterval = new Interval(interval.min, interval.min);
 		while(searchInterval.max <= interval.max && Math.signum(this.at(searchInterval.min, n)) == Math.signum(this.at(searchInterval.max, n)))
 			searchInterval.max += 0.01;
 		
+		// If the search interval is larger than the given interval, abort; there are no roots on this interval
 		if(searchInterval.max >= interval.max || Math.signum(this.at(searchInterval.min, n)) == Math.signum(this.at(searchInterval.max, n)))
 			return;
 		
+		// Find all roots on the remaining interval
 		findRoots(dest, new Interval(searchInterval.max, interval.max), n);
 		
-		Interval originalSearchInterval = new Interval(searchInterval.min, searchInterval.max);
-		boolean foundRoot = false;
-		double rootVal = 0.0;
-		
+		// Bisection algorithm
 		for(int i = 0; i < MAX_ITERATIONS; i++)
 		{
+			// Calculate f at center point of interval
 			double c = this.at(searchInterval.center(), n);
-			System.out.println(c);
 			
+			// Shrink interval on the left or right, depending on the sign of the function values
 			if(Math.signum(c) == Math.signum(this.at(searchInterval.min, n)))
 				searchInterval.min = searchInterval.center();
 			else
 				searchInterval.max = searchInterval.center();
 			
+			// If the interval is small enough, try to finish
 			if (searchInterval.max - searchInterval.min <= MAX_ERROR)
 			{
+				// If the function values are above the error, this point is most likely a pole and not a root
+				// To be sure, perform more iterations
 				if(Math.abs(this.at(searchInterval.max, n) - this.at(searchInterval.min, n)) > MAX_ERROR)
 					continue;
 				
-				foundRoot = true;
-				rootVal = searchInterval.center();
+				// Add the root to the array
+				dest.add(searchInterval.center());
 				break;
 			}
 		}
-		
-		if (foundRoot)
-		{
-			dest.add(rootVal);
-			findRoots(dest, new Interval(originalSearchInterval.min, rootVal - 0.01), n);
-			findRoots(dest, new Interval(rootVal + 0.01, originalSearchInterval.max), n);
-		}
 	}
 	
+	/**
+	 * Returns the inverse of the function at position x. It is used in the pole finding algorithm
+	 * @param x Position to evaluate the function at
+	 * @return The inverse of the function at position x
+	 */
 	private double inverseAt(double x)
 	{
 		double y = this.at(x);
@@ -200,6 +214,12 @@ public class Function
 		return 1.0 / y;
 	}
 	
+	/**
+	 * Finds all poles of the function on an interval.
+	 * It performs a bisection of the inverse of f
+	 * 
+	 * @param interval
+	 */
 	private void findPoles(Interval interval)
 	{
 		final int MAX_ITERATIONS = 100;
@@ -214,14 +234,9 @@ public class Function
 		
 		findPoles(new Interval(searchInterval.max, interval.max));
 		
-		Interval originalSearchInterval = new Interval(searchInterval.min, searchInterval.max);
-		boolean foundRoot = false;
-		double rootVal = 0.0;
-		
 		for(int i = 0; i < MAX_ITERATIONS; i++)
 		{
 			double c = this.inverseAt(searchInterval.center());
-			System.out.println(c);
 			
 			if(Math.signum(c) == Math.signum(this.inverseAt(searchInterval.min)))
 				searchInterval.min = searchInterval.center();
@@ -233,17 +248,9 @@ public class Function
 				if(Math.abs(this.inverseAt(searchInterval.max) - this.inverseAt(searchInterval.min)) > MAX_ERROR)
 					continue;
 				
-				foundRoot = true;
-				rootVal = searchInterval.center();
+				poles.add(searchInterval.center());
 				break;
 			}
-		}
-		
-		if (foundRoot)
-		{
-			poles.add(rootVal);
-			findPoles(new Interval(originalSearchInterval.min, rootVal - 0.01));
-			findPoles(new Interval(rootVal + 0.01, originalSearchInterval.max));
 		}
 	}
 }

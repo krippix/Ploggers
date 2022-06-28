@@ -19,9 +19,10 @@ import de.aop.parser.Parser;
 
 public class Plot extends JPanel
 {
-
-	private static final int X_SCALE_MARKERS = 10; // Amount of markers going from middle to top and bottom each
-	private static final int Y_SCALE_MARKERS = 10; // Amount of markers going from middle to left and right each
+	private static final int X_SCALE_MARKERS_MIN = 10; // Minimum amount of markers going from middle to top and bottom each
+	private static final int Y_SCALE_MARKERS_MIN = 10; // Minimum amount of markers going from middle to left and right each
+	private int xScaleMarkers = 0; // actual number of scale markers
+	private int yScaleMarkers = 0; // actual number of scale markers
 	private Function data;
 	private int markerGap;
 	private Coordinate middle;
