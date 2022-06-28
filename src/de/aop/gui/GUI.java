@@ -82,7 +82,6 @@ public class GUI extends JFrame
 		this.functionInput.setText("(x+1.5)*x*(x-1.5)");
 		this.functionInput.setPreferredSize(new Dimension(0,30)); // width, height
 		this.functionInput.setToolTipText("f(x)");
-		// TODO this.functionInput.addFocusListener(null)
 		this.functionInput.addActionListener(e->generatePlot());
 		
 		this.menuPanel.add(this.functionInput, format);
@@ -132,9 +131,6 @@ public class GUI extends JFrame
 			}
 		});
 		
-		
-		
-
 		this.window.pack();
 		this.window.setVisible(true);
 	}

@@ -400,40 +400,17 @@ public class Plot extends JPanel
 		{
 			if (isNegative)
 			{
-				this.scale.x -= 1;
+				this.scale.x += 1;
 			}
 			else
 			{
-				this.scale.x += 1;
+				this.scale.x -= 1;
 			}
 			this.scale.y = Math.pow(2,this.scale.x/2);
 		}
 		repaint();
 	}
 	
-	
-	/**
-	 * Change scale x times by rate
-	 * @param times
-	 * @param rate
-	 */
-	private void scaleHelper(int times, double rate)
-	{
-		for (int i=0; i < times; i++)
-		{
-			this.scale.x++;
-			
-		}
-		
-		// Now round the scale to a reasonable number
-		double roundTo = 0.1;
-		
-		//this.scale = Math.round(this.scale/roundTo)*roundTo;
-		
-		repaint();
-		System.out.println("Scale is "+this.scale.y);
-	}
-
 	
 	/**
 	 * Sets data that will be used for drawing the graph
