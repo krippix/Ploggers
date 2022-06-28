@@ -56,11 +56,26 @@ public class Function
 		findRoots(inflections, domain, 2);
 		
 		findPoles(domain);
-		
-		System.out.println("Roots      :" + roots.toString());
-		System.out.println("Extrema    :" + extrema.toString());
-		System.out.println("Inflections:" + inflections.toString());
-		System.out.println("Poles      :" + poles.toString());
+	}
+	
+	public ArrayList<Double> getRoots()
+	{
+		return roots;
+	}
+	
+	public ArrayList<Double> getExtrema()
+	{
+		return extrema;
+	}
+	
+	public ArrayList<Double> getInflections()
+	{
+		return inflections;
+	}
+	
+	public ArrayList<Double> getPoles()
+	{
+		return poles;
 	}
 	
 	public void setDomain(double newMin, double newMax)
