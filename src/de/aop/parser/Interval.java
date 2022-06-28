@@ -19,4 +19,9 @@ public class Interval
 	{
 		return (x >= this.min) && (x <= this.max);
 	}
+	
+	public double length()
+	{
+		return this.max - this.min;
+	}
 }
