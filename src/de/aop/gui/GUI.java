@@ -11,6 +11,8 @@ import java.awt.Insets;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.GridBagLayout;
@@ -24,6 +26,7 @@ public class GUI extends JFrame
 	JPanel infoPanel;
 	Plot contentPanel;
 	JTextField functionInput;
+	JSlider scaleSlider;
 	JButton buttonGenerate;
 	Image graph;
 	
@@ -76,13 +79,16 @@ public class GUI extends JFrame
 		format.anchor = GridBagConstraints.NORTH;
 		format.fill = GridBagConstraints.HORIZONTAL;
 		this.functionInput = new JTextField(1);
-		this.functionInput.setText("f(x)");
+		this.functionInput.setText("(x+1.5)*x*(x-1.5)");
 		this.functionInput.setPreferredSize(new Dimension(0,30)); // width, height
-		// TODO this.functionInput.addFocusListener(null)
+		this.functionInput.setToolTipText("f(x)");
 		this.functionInput.addActionListener(e->generatePlot());
 		
 		this.menuPanel.add(this.functionInput, format);
 					
+		// Slider for Scale 
+		
+		
 		// Button "generate" --> This button determines the size of the side panel
 		format.gridx = 0;
 		format.gridy = 10;
@@ -116,26 +122,15 @@ public class GUI extends JFrame
 		
 		this.basePanel.add(this.contentPanel, BorderLayout.CENTER);
 
-
-
-		/*
-		// content panel with graph image
-		GridBagConstraints contentFormat = new GridBagConstraints();
+		// React to mouse wheel
+		this.contentPanel.addMouseWheelListener(new MouseWheelListener()
+		{
+			public void mouseWheelMoved(MouseWheelEvent e)
+			{
+				contentPanel.changeScale(e.getWheelRotation());
+			}
+		});
 		
-		
-		contentFormat.gridx = 2;
-		contentFormat.gridy = 0;
-		contentFormat.weightx = 0.8;
-		contentFormat.insets = new Insets(4,0,0,4); // top, left, bottom, right
-		
-		contentFormat.anchor = GridBagConstraints.NORTHEAST;
-		contentFormat.fill = GridBagConstraints.BOTH;
-		
-		this.basePanel.add(this.contentPanel, contentFormat);
-		*/
-				
-		// window settings
-		//this.window.setSize(1200,800);
 		this.window.pack();
 		this.window.setVisible(true);
 	}
