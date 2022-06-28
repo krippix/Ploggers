@@ -26,14 +26,14 @@ public class Plot extends JPanel
 	private int markerGap;
 	private Coordinate middle;
 
-	double scale = 4; // probably only visual :D
+	private Coordinate scale; // Scale of the whole grid
 	
 	/**
 	 * 
 	 */
 	public Plot()
 	{
-		getLabel(2);
+		this.scale = new Coordinate(1,1);
 		// ToDo, Roberts dateityp entgegenehmen, oder in anderer Klasse die wichtigen Punkte berechnen
 		// Klasse dafür wird vermutlich Graph, in der sollen dann die Wichtigen Punkte und der Parse abgelegt werden.
 	}	
@@ -233,8 +233,8 @@ public class Plot extends JPanel
 	{
 		Coordinate result = new Coordinate(0,0);
 		
-		result.x = x * this.markerGap * scale + this.middle.x;
-		result.y = y * (-1) *this.markerGap * scale + this.middle.y ; 
+		result.x = x * this.markerGap * this.scale.y + this.middle.x;
+		result.y = y * (-1) *this.markerGap * this.scale.y + this.middle.y ; 
 		
 		return result; 
 	}
@@ -245,8 +245,8 @@ public class Plot extends JPanel
 	{
 		Coordinate result = new Coordinate(0,0);
 		
-		result.x = (x - this.middle.x) / (this.markerGap * scale);
-		result.y = (y - this.middle.y) / (this.markerGap * scale) * (-1);
+		result.x = (x - this.middle.x) / (this.markerGap * this.scale.y);
+		result.y = (y - this.middle.y) / (this.markerGap * this.scale.y) * (-1);
 		
 		return result;
 	}
@@ -355,7 +355,6 @@ public class Plot extends JPanel
 	private String getLabel(double number)
 	{
 		String str_number = Double.toString(number);
-		System.out.println(str_number);
 		String[] str_part = str_number.split("\\.");
 		boolean isNegative = false;
 		
@@ -374,9 +373,6 @@ public class Plot extends JPanel
 		{
 			str_number = str_part[0]+"."+str_part[1].substring(0,1);
 		}
-	
-				
-		System.out.println("Label result: "+str_number);
 		
 		// Re-Add '-' if removed earlier
 		if (isNegative)
@@ -390,11 +386,66 @@ public class Plot extends JPanel
 	}
 	
 	
+	/**
+	 * Changes Scale by some percentage depending on the input variable 
+	 * @param change
+	 */
+	public void changeScale(int change)
+	{
+		boolean isNegative = false;
+		
+		if (change < 0)
+		{
+			isNegative = true;
+			change = change * -1;
+		}
+		
+		
+		for (int i=0; i < change; i++)
+		{
+			if (isNegative)
+			{
+				this.scale.x -= 1;
+			}
+			else
+			{
+				this.scale.x += 1;
+			}
+			this.scale.y = Math.pow(2,this.scale.x/2);
+		}
+		repaint();
+	}
 	
-	// test function
+	
+	/**
+	 * Change scale x times by rate
+	 * @param times
+	 * @param rate
+	 */
+	private void scaleHelper(int times, double rate)
+	{
+		for (int i=0; i < times; i++)
+		{
+			this.scale.x++;
+			
+		}
+		
+		// Now round the scale to a reasonable number
+		double roundTo = 0.1;
+		
+		//this.scale = Math.round(this.scale/roundTo)*roundTo;
+		
+		repaint();
+		System.out.println("Scale is "+this.scale.y);
+	}
+	
+	
+	/**
+	 * Sets data that will be used for drawing the graph
+	 * @param data
+	 */
 	public void setData(Parser data)
 	{
 		this.data = data;
 	}
-	
 }
