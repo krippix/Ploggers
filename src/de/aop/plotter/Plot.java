@@ -8,6 +8,8 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.util.ArrayList;
+
 import javax.swing.*;
 
 
@@ -236,7 +238,7 @@ public class Plot extends JPanel
 	
 	
 	// convert pixel position to real numbers
-	private Coordinate pixelToFunction(double x, double y)
+	public Coordinate pixelToFunction(double x, double y)
 	{
 		Coordinate result = new Coordinate(0,0);
 		
@@ -262,6 +264,7 @@ public class Plot extends JPanel
 		Coordinate currentPoint = new Coordinate(0,0);
 		Coordinate previousPoint = new Coordinate(0,0);
 		
+		ArrayList<Double> poles = data.getPoles();
 		
 		while (xPixel <= width)
 		{
@@ -277,11 +280,54 @@ public class Plot extends JPanel
 			
 			if (currentPoint.y < getHeight() * 1.2 && currentPoint.y > -getHeight()*0.2)
 			{
-				g.drawLine(previousPoint.xAsInt(), previousPoint.yAsInt(), currentPoint.xAsInt(), currentPoint.yAsInt());
+				// Avoid drawing lines through poles
+				boolean poleInbetween = false;
+				for(double pole : poles)
+				{
+					double poleScreen = functionToPixel(pole, 0).x;
+					
+					if(previousPoint.x < poleScreen && poleScreen < currentPoint.x)
+					{
+						poleInbetween = true;
+						break;
+					}
+				}
+					
+				if(!poleInbetween)
+				{
+					g.drawLine(previousPoint.xAsInt(), previousPoint.yAsInt(), currentPoint.xAsInt(), currentPoint.yAsInt());
+				
+				}
+				else	// If there is a pole, connect the points with some point at infinity above/below them
+				{
+					connectWithInfinity(g, previousPoint, true);
+					connectWithInfinity(g, currentPoint, false);
+				}
+				
 				previousPoint = currentPoint.clone();
 			}
 			xPixel++;
 		}
+	}
+	
+	/**
+	 * Connects a coordinate with infinity. Takes into account whether the function approaches
+	 * +inf or -inf at this point.
+	 * @param g Canvas to draw to
+	 * @param from Point to connect with infinity
+	 * @param beforePole Whether this point is before or after a pole
+	 */
+	private void connectWithInfinity(Graphics2D g, Coordinate from, boolean beforePole)
+	{
+		// The slope of the function at the point determines whether we connect with +inf or -inf
+		double x = pixelToFunction(from.x, from.y).x;
+		double slope = data.at(x, 1);
+		
+		// If the point is after a pole, the logic needs to be inverted
+		double factor = beforePole ? -1.0 : 1.0;
+		
+		Coordinate infinity = new Coordinate(from.x, Math.signum(slope) * getHeight() * factor + 10);
+		g.drawLine(from.xAsInt(), from.yAsInt(), infinity.xAsInt(), infinity.yAsInt());
 	}
 	
 	/**
@@ -408,6 +454,8 @@ public class Plot extends JPanel
 			}
 			this.scale.y = Math.pow(2,this.scale.x/2);
 		}
+		
+		data.setDomain(pixelToFunction(0, 0).x, pixelToFunction(getWidth(), 0).x);
 		repaint();
 	}
 	

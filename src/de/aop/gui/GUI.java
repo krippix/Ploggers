@@ -138,7 +138,7 @@ public class GUI extends JFrame
 	
 	private void generatePlot()
 	{
-		Function function = new Function(this.functionInput.getText(), -5.0, 5.0);
+		Function function = new Function(this.functionInput.getText(), contentPanel.pixelToFunction(0, 0).x, contentPanel.pixelToFunction(contentPanel.getWidth(), 0).x);
 		if(!function.isValid())
 		{
 			// TODO: Display Error in GUI
