@@ -11,7 +11,9 @@ import de.aop.exceptions.SyntaxError;
 public class Function
 {
 	// Used in the numerical differentiation algorithm
-	static double MACHINE_EPSILON = Math.ulp(1.0);
+	static final double MACHINE_EPSILON = Math.ulp(1.0);
+	static final double MAX_ITERATIONS = 100;
+	static final double ERROR_SCALE = 0.0001;
 	
 	private Parser parser = null;
 	
@@ -144,6 +146,11 @@ public class Function
 		return range;
 	}
 	
+	private boolean signsDifferent(double a, double b)
+	{
+		return Math.signum(a) != Math.signum(b) && Math.abs(b - a) > ERROR_SCALE;
+	}
+	
 	/**
 	 * Finds all roots of the n-th derivative of the function on an interval.
 	 * The algorithm used is the bisection algorithm
@@ -154,24 +161,22 @@ public class Function
 	 */
 	private void findRoots(ArrayList<Double> dest, Interval interval, int n)
 	{
-		// Hardcoded bounds and errors
-		// TODO: Don't hardcode them, they should adjust with the size of the interval
-		final int MAX_ITERATIONS = 100;
-		final double MAX_ERROR = 0.000001;
-		
 		// Find the interval this function should search.
 		// It starts with the smallest possible interval and then incrementally
 		// enlarges it until the conditions for bisection are satisfied
 		Interval searchInterval = new Interval(interval.min, interval.min);
-		while(searchInterval.max <= interval.max && Math.signum(this.at(searchInterval.min, n)) == Math.signum(this.at(searchInterval.max, n)))
-			searchInterval.max += 0.01;
-		
+		double stepSize = 0.001 * interval.length();
+		while (searchInterval.max <= interval.max && !signsDifferent(this.at(searchInterval.min, n), this.at(searchInterval.max, n)))
+			searchInterval.max += stepSize;
+			
 		// If the search interval is larger than the given interval, abort; there are no roots on this interval
-		if(searchInterval.max >= interval.max || Math.signum(this.at(searchInterval.min, n)) == Math.signum(this.at(searchInterval.max, n)))
+		if(searchInterval.max > interval.max || !signsDifferent(this.at(searchInterval.min, n), this.at(searchInterval.max, n)))
 			return;
 		
 		// Find all roots on the remaining interval
 		findRoots(dest, new Interval(searchInterval.max, interval.max), n);
+		
+		final double MAX_ERROR = ERROR_SCALE * searchInterval.length();
 		
 		// Bisection algorithm
 		for(int i = 0; i < MAX_ITERATIONS; i++)
@@ -222,17 +227,17 @@ public class Function
 	 */
 	private void findPoles(Interval interval)
 	{
-		final int MAX_ITERATIONS = 100;
-		final double MAX_ERROR = 0.000001;
-		
 		Interval searchInterval = new Interval(interval.min, interval.min);
-		while(searchInterval.max <= interval.max && Math.signum(this.inverseAt(searchInterval.min)) == Math.signum(this.inverseAt(searchInterval.max)))
-			searchInterval.max += 0.01;
+		double stepSize = 0.001 * interval.length();
+		while(searchInterval.max <= interval.max && !signsDifferent(this.inverseAt(searchInterval.min), this.inverseAt(searchInterval.max)))
+			searchInterval.max += stepSize;
 		
-		if(searchInterval.max >= interval.max || Math.signum(this.inverseAt(searchInterval.min)) == Math.signum(this.inverseAt(searchInterval.max)))
+		if(searchInterval.max >= interval.max || !signsDifferent(this.inverseAt(searchInterval.min), this.inverseAt(searchInterval.max)))
 			return;
 		
 		findPoles(new Interval(searchInterval.max, interval.max));
+		
+		final double MAX_ERROR = ERROR_SCALE * searchInterval.length();
 		
 		for(int i = 0; i < MAX_ITERATIONS; i++)
 		{
