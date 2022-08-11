@@ -29,3 +29,17 @@ hs_err_pid*
 
 .classpath
 .project
+
+# LaTeX files
+*.aux
+*.fdb*
+*.fls
+*.log
+*.out
+*.gz
+*.toc
+*.loe
+*.maf
+*.mtc*
+*.pdf
+*.gz
