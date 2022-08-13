@@ -35,9 +35,7 @@ public class Plot extends JPanel
 		// Klasse dafür wird vermutlich Graph, in der sollen dann die Wichtigen Punkte und der Parse abgelegt werden.
 	}	
 	
-	
-
-		
+			
 	/**
 	 * This is handling all drawing an is called when needed by swing
 	 */
@@ -47,9 +45,7 @@ public class Plot extends JPanel
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g;
 	    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-	    
-	    
-	    
+	        
 	    // Sets x and yMiddle to usable ints
 	    calcCanvasMiddle();
 	    
@@ -65,11 +61,9 @@ public class Plot extends JPanel
 	    // Draw numbers on x- and y-axis
 	    drawPlotNumbering(g2);
 	    
-	    
 	    if (data != null) {
 	    	drawFunction(g2);
 	    }
-	    
 	    
 	    // TODO Anhand der Extrempunkte usw. feststellen welcher Teil des Graphen überhaupt interessant ist.
 	    //System.out.println("Result: "+getLabel(-1.4123));
@@ -84,7 +78,6 @@ public class Plot extends JPanel
 	{
        return new Dimension(601, 601);
     }
-	
 	
 	
 	/**
@@ -151,6 +144,7 @@ public class Plot extends JPanel
 	
 	
 	/**
+	 * Draws background lines for Plot
 	 * @param Graphics object to wich lines are drawn
 	 */
 	private void drawSecondaryLines(Graphics2D g)
@@ -198,9 +192,9 @@ public class Plot extends JPanel
 			currentPosition -= this.markerGap;
 			// DEBUG System.out.println("CurrentPosition x->0: "+currentPosition+", "+this.markerGap);			
 		}
-		
 	}
 	
+
 	/**
 	 * Adds axis labels to Graph
 	 * @param graphics object to draw on
@@ -225,7 +219,12 @@ public class Plot extends JPanel
 	}
 	
 	
-	// real number to pixel position (0,0) -> (middle.x,middle.y)
+	/**
+	 * Converts function value to their Pixel position equivalent
+	 * @param x
+	 * @param y
+	 * @return pixel position coordinates
+	 */
 	public Coordinate functionToPixel(double x, double y)
 	{
 		Coordinate result = new Coordinate(0,0);
@@ -237,7 +236,12 @@ public class Plot extends JPanel
 	}
 	
 	
-	// convert pixel position to real numbers
+	/**
+	 * Converts pixel coordinates to real number equivalent
+	 * @param x
+	 * @param y
+	 * @return real number coordinates
+	 */
 	public Coordinate pixelToFunction(double x, double y)
 	{
 		Coordinate result = new Coordinate(0,0);
@@ -249,7 +253,10 @@ public class Plot extends JPanel
 	}
 	
 	
-	// Drawing the function on top of the canvas
+	/**
+	 * Draws function on top of the graphic object
+	 * @param g Graphics object to draw on
+	 */
 	private void drawFunction(Graphics2D g)
 	{
 		g.setColor(Color.red);
@@ -310,6 +317,7 @@ public class Plot extends JPanel
 		}
 	}
 	
+
 	/**
 	 * Connects a coordinate with infinity. Takes into account whether the function approaches
 	 * +inf or -inf at this point.
@@ -330,10 +338,11 @@ public class Plot extends JPanel
 		g.drawLine(from.xAsInt(), from.yAsInt(), infinity.xAsInt(), infinity.yAsInt());
 	}
 	
+
 	/**
 	 * Draws numbers on x- and y-axis for scale
 	 * More details about the mesurement: https://docs.oracle.com/javase/tutorial/2d/text/measuringtext.html
-	 * @param the plot graphics object
+	 * @param g Graphic object to draw to
 	 */
 	private void drawPlotNumbering(Graphics2D g)
 	{
@@ -384,10 +393,10 @@ public class Plot extends JPanel
 			label = getLabel(pixelToFunction(0,yPos).y);
 			offset2 = -(metrics.stringWidth(label));
 			g.drawString(label, xPos+offset+offset2, yPos-offset);
-		}
-		
+		}	
 	}
 	
+
 	/**
 	 * Takes Double and returns fitting label for x/y-axis
 	 * @param number
