@@ -1,4 +1,5 @@
 package de.aop.plotter;
+import de.aop.exceptions.SyntaxError;
 import de.aop.parser.Function;
 
 import java.awt.BasicStroke;
@@ -19,6 +20,8 @@ public class Plot extends JPanel
 	private static final int Y_SCALE_MARKERS_MIN = 10; // Minimum amount of markers going from middle to left and right each
 	private int xScaleMarkers = 0; // actual number of scale markers
 	private int yScaleMarkers = 0; // actual number of scale markers
+	private double xRangeFrom = -10;
+	private double xRangeTo = 10;
 	private Function data;
 	private int markerGap;
 	private Coordinate middle;
@@ -52,7 +55,7 @@ public class Plot extends JPanel
 	    // Calculate biggest marker gap that keeps the graph intact
 	    calcMarkerGap();
 	    
-	    // Draw x- and y-axis helper lines
+	    // Draw x- and y-axis secondary lines
 	    drawSecondaryLines(g2);
 	    
 	    // Draw x- and y-axis 
@@ -149,6 +152,15 @@ public class Plot extends JPanel
 	 */
 	private void drawSecondaryLines(Graphics2D g)
 	{
+		if (data != null)
+		{
+			ArrayList<Double> test = data.getExtrema();
+			for (int i=0; i < test.size(); i++)
+			{
+				System.out.println(test.get(i));
+			}
+		}
+		
 		// X-Axis additions
 		int currentPosition = middle.yAsInt();
 		g.setColor(Color.lightGray);
@@ -476,5 +488,23 @@ public class Plot extends JPanel
 	public void setData(Function data)
 	{
 		this.data = data;
+	}
+
+
+	/**
+	 * Set's x-Axis range displayed
+	 * @param from
+	 * @param to
+	 */
+	public void setRange(double from, double to) throws IllegalArgumentException
+	{
+		if (from < to)
+		{
+			this.xRangeFrom = from;
+			this.xRangeTo = to;
+			return;
+		}
+
+		throw new IllegalArgumentException();
 	}
 }

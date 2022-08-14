@@ -6,7 +6,7 @@ import de.aop.exceptions.SyntaxError;
 
 /**
  * A wrapper around a Parser object with some additional
- * QoL life methods for function evaluation and analysis
+ * QoL methods for function evaluation and analysis
  */
 public class Function
 {

@@ -1,38 +1,33 @@
 package de.aop.gui;
 
-import de.aop.exceptions.SyntaxError;
 import de.aop.parser.Function;
-import de.aop.parser.Parser;
 import de.aop.plotter.*;
 
 import javax.swing.*;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 public class GUI extends JFrame
 {
 	JFrame window;
 	JPanel basePanel;
 	JPanel menuPanelLeft;
+		JTextField functionInput;
+		JLabel errorMessage;
 	JPanel menuPanelBottom;
+		JButton buttonGenerate;
+		JButton buttonClear;
 	Plot contentPanel;
-	//JTextField functionInput;
-	JTextField[] functionInput;
-	int function_amount = 1;
-	JSlider scaleSlider;
-	JButton buttonGenerate;
-	JButton buttonClear;
-	Image graph;
+		Image graph;
+	
+	
+	JFormattedTextField from;
+	JFormattedTextField to;
 	
 	
 	/**
@@ -70,7 +65,6 @@ public class GUI extends JFrame
 	
 		// Menu Panel Left
 		this.menuPanelLeft = new JPanel();
-		this.menuPanelLeft.setLayout(new GridBagLayout());
 		this.menuPanelLeft.setBackground(Color.lightGray);
 	
 			// Menu panel - content
@@ -82,16 +76,26 @@ public class GUI extends JFrame
 			format.weighty = 1;
 			format.insets = new Insets(4,4,4,4); // top, left, bottom, right
 			format.anchor = GridBagConstraints.NORTH;
-			
-			this.functionInput = new JTextField[5];
 
-			this.functionInput[0] = new JTextField(1);
-			this.functionInput[0].setText("(x+4)*0.1*x*(x-4)");
-			this.functionInput[0].setColumns(15); // width, height
-			this.functionInput[0].setToolTipText("f(x)");
-			this.functionInput[0].addActionListener(e->generatePlot());
+			Font font1 = new Font("SansSerif", Font.PLAIN, 20);
+
+			this.functionInput = new JTextField(1);
+			this.functionInput.setFont(font1);
+			this.functionInput.setText("(x+4)*0.1*x*(x-4)");
+			this.functionInput.setColumns(10); // width, height
+			this.functionInput.addActionListener(e->generatePlot());
 			
-			this.menuPanelLeft.add(this.functionInput[0], format);
+			this.menuPanelLeft.add(this.functionInput, format);
+
+			// place error message below Textinput field
+			this.errorMessage = new JLabel(" ❓ ");
+			this.errorMessage.setFont(font1);
+			this.errorMessage.setToolTipText("Enter your function here.");
+			format.gridx = 0;
+			format.gridy = 1;
+			format.weighty = 1;
+
+			this.menuPanelLeft.add(this.errorMessage, format);
  
 		this.basePanel.add(menuPanelLeft, BorderLayout.WEST);
 		
@@ -111,7 +115,6 @@ public class GUI extends JFrame
 			format.gridy = 0;
 
 			this.menuPanelBottom.add(buttonGenerate, format);
-			
 
 		JButton buttonClear = new JButton("Clear");
 			buttonClear.addActionListener(e->clearGraphs());
@@ -123,6 +126,32 @@ public class GUI extends JFrame
 			this.menuPanelBottom.add(buttonClear, format);
 		this.basePanel.add(menuPanelBottom, BorderLayout.SOUTH);	
 		
+		NumberFormat numFormat = DecimalFormat.getInstance();
+
+		JLabel labelFrom = new JLabel("from");
+			format.anchor = GridBagConstraints.EAST;
+			format.gridx = 2;
+
+			this.menuPanelBottom.add(labelFrom, format);
+
+		this.from = new JFormattedTextField(numFormat);
+			from.setColumns(8);
+			from.setText("-10");
+			format.gridx = 3;
+
+			this.menuPanelBottom.add(from, format);
+		
+		JLabel labelTo = new JLabel("to");
+			format.gridx = 4;
+
+			this.menuPanelBottom.add(labelTo, format);
+
+		this.to = new JFormattedTextField(numFormat);
+			to.setColumns(8);
+			to.setText("10");
+			format.gridx = 5;
+
+			this.menuPanelBottom.add(to, format);
 		
 		// Content panel
 		this.contentPanel = new Plot();
@@ -135,9 +164,11 @@ public class GUI extends JFrame
 			public void mouseWheelMoved(MouseWheelEvent e)
 			{
 				contentPanel.changeScale(e.getWheelRotation());
+				contentPanel.repaint();
 			}
 		});
-		
+
+		contentPanel.repaint();
 		this.window.pack();
 		this.window.setVisible(true);
 	}
@@ -148,15 +179,25 @@ public class GUI extends JFrame
 	 */
 	public void generatePlot()
 	{
-		Function function = new Function(this.functionInput[0].getText(), contentPanel.pixelToFunction(0, 0).x, contentPanel.pixelToFunction(contentPanel.getWidth(), 0).x);
+		Function function = new Function(this.functionInput.getText(), contentPanel.pixelToFunction(0, 0).x, contentPanel.pixelToFunction(contentPanel.getWidth(), 0).x);
+	
 		if(!function.isValid())
 		{
-			// TODO: Display Error in GUI
-			System.err.println(function.getSyntaxError().toString());
+			this.functionInput.setBackground(Color.PINK);
+			this.errorMessage.setToolTipText(function.getSyntaxError().toString());
 			return;
 		}
+
+		this.errorMessage.setToolTipText("Enter your function here.");
+		this.functionInput.setBackground(Color.white);
 		
-		this.contentPanel.setData(function);
+		try
+		{
+			this.contentPanel.setData(function);
+		} catch (Exception e){
+			System.out.println("left cant be smaller than right!");
+		}
+		this.contentPanel.setRange(Double.parseDouble(this.from.getText()),Double.parseDouble(this.to.getText()));
 		this.contentPanel.repaint();
 		
 	}
@@ -168,23 +209,5 @@ public class GUI extends JFrame
 	{
 		this.contentPanel.setData(null);
 		this.contentPanel.repaint();
-	}
-
-
-	/**
-	 * Handle the amount of configurable functions
-	 */
-	private void addFunction()
-	{
-		
-	}
-
-
-	/**
-	 * Generates all input text fields for functions
-	 */
-	private void generateFunctionInputs()
-	{
-
 	}
 }
