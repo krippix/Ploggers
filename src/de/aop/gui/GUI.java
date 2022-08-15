@@ -1,6 +1,7 @@
 package de.aop.gui;
 
 import de.aop.parser.Function;
+import de.aop.parser.Interval;
 import de.aop.plotter.*;
 
 import javax.swing.*;
@@ -161,7 +162,12 @@ public class GUI extends JFrame
 		{
 			public void mouseWheelMoved(MouseWheelEvent e)
 			{
-				contentPanel.changeScale(e.getWheelRotation());
+				// contentPanel.changeScale(e.getWheelRotation());
+				Interval domain = contentPanel.getData().getDomain();
+				domain.min--;
+				domain.max++;
+				
+				contentPanel.getData().setDomain(domain.min, domain.max);
 				contentPanel.repaint();
 			}
 		});
@@ -177,7 +183,7 @@ public class GUI extends JFrame
 	 */
 	public void generatePlot()
 	{
-		Function function = new Function(this.functionInput.getText(), contentPanel.pixelToFunction(0, 0).x, contentPanel.pixelToFunction(contentPanel.getWidth(), 0).x);
+		Function function = new Function(this.functionInput.getText(), Double.parseDouble(this.from.getText()), Double.parseDouble(this.to.getText()));
 	
 		if(!function.isValid())
 		{

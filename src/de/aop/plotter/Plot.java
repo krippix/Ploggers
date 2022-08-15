@@ -1,6 +1,7 @@
 package de.aop.plotter;
 import de.aop.exceptions.SyntaxError;
 import de.aop.parser.Function;
+import de.aop.parser.Interval;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -230,6 +231,10 @@ public class Plot extends JPanel
 	    g.drawLine(middle.xAsInt(), 0, middle.xAsInt()-4, 4);
 	}
 	
+	public double map(Interval from, Interval to, double val)
+	{
+		return (val - from.min) * to.length() / from.length() + to.min;
+	}
 	
 	/**
 	 * Converts function value to their Pixel position equivalent
@@ -274,6 +279,9 @@ public class Plot extends JPanel
 		g.setStroke(new BasicStroke(2f));
 		
 		
+		Interval screenWidth = new Interval(0, getWidth());
+		Interval screenHeight = new Interval(getHeight(), 0);
+		
 		int width = getWidth();
 		int xPixel = 0; // iterator from left to right of visible canvas
 		double xReal = 0; // x as Real number for function to use
@@ -284,6 +292,27 @@ public class Plot extends JPanel
 		
 		ArrayList<Double> poles = data.getPoles();
 		
+		Interval domain = data.getDomain();
+		Interval range = data.getRange();
+		range.min -= range.length()* 0.1;
+		range.max += range.length()* 0.1;
+		
+		for(int i = 0; i < 500; i++)
+		{
+			double x = domain.min + domain.length() * (double)i / 500.0;
+			double y = data.at(x);
+			
+			currentPoint = new Coordinate(
+				map(domain, screenWidth, x),
+				map(range, screenHeight, y)
+			);
+			
+			g.drawLine(previousPoint.xAsInt(), previousPoint.yAsInt(), currentPoint.xAsInt(), currentPoint.yAsInt());
+			
+			previousPoint = currentPoint;
+		}
+		
+		/*
 		while (xPixel <= width)
 		{
 			xReal = pixelToFunction(xPixel, 0).x;
@@ -326,6 +355,7 @@ public class Plot extends JPanel
 			}
 			xPixel++;
 		}
+		*/
 	}
 	
 
@@ -525,6 +555,11 @@ public class Plot extends JPanel
 	public void setData(Function data)
 	{
 		this.data = data;
+	}
+	
+	public Function getData()
+	{
+		return this.data;
 	}
 
 
