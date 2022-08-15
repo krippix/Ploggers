@@ -308,6 +308,35 @@ public class Plot extends JPanel
 			}
 			xPixel++;
 		}
+		
+		g.setColor(Color.GRAY);
+		
+		for(double x : data.getRoots())
+		{
+			double y = data.at(x);
+			
+			Coordinate point = functionToPixel(x, y);
+			
+			g.fillOval(point.xAsInt() - 4, point.yAsInt() - 4, 9, 9);
+		}
+		
+		for(double x : data.getExtrema())
+		{
+			double y = data.at(x);
+			
+			Coordinate point = functionToPixel(x, y);
+			
+			g.fillOval(point.xAsInt() - 4, point.yAsInt() - 4, 9, 9);
+		}
+		
+		for(double x : data.getInflections())
+		{
+			double y = data.at(x);
+			
+			Coordinate point = functionToPixel(x, y);
+			
+			g.fillOval(point.xAsInt() - 4, point.yAsInt() - 4, 9, 9);
+		}
 	}
 	
 	/**
