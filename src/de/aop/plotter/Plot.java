@@ -256,7 +256,8 @@ public class Plot extends JPanel
 	public Coordinate pixelToFunction(double x, double y)
 	{
 		Coordinate result = new Coordinate(0,0);
-		result.x = (x - this.middle.x) / (this.markerGap * this.scale.x) + calculateXOffset();
+		// old : result.x = (x - this.middle.x) / (this.markerGap * this.scale.x);
+		result.x = (x - this.middle.x) / (this.markerGap * this.scale.x);
 		result.y = (y - this.middle.y) / (this.markerGap * this.scale.y) * (-1);
 		
 		return result;

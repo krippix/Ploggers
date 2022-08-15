@@ -182,7 +182,7 @@ public class GUI extends JFrame
 		if(!function.isValid())
 		{
 			this.functionInput.setBackground(Color.PINK);
-			this.errorMessage.setToolTipText(function.getSyntaxError().toString());
+			this.errorMessage.setToolTipText(function.getSyntaxError().getMessage());
 			return;
 		}
 
