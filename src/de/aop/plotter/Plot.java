@@ -22,9 +22,13 @@ public class Plot extends JPanel
 	private int yScaleMarkers = 0; // actual number of scale markers
 	private double xRangeFrom = -10;
 	private double xRangeTo = 10;
+	private double xOffset = 0; // Offset how far away from x0 current middle is. 
+	private double[] xAxisLabels;
+	private double[] yAxisLabels;
 	private Function data;
 	private int markerGap;
 	private Coordinate middle;
+	private Coordinate origin; // pixel location of origin
 
 	private Coordinate scale; // Scale of the whole grid
 	
@@ -48,17 +52,20 @@ public class Plot extends JPanel
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g;
 	    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-	        
+	     
 	    // Sets x and yMiddle to usable ints
 	    calcCanvasMiddle();
 	    
 	    // Calculate biggest marker gap that keeps the graph intact
 	    calcMarkerGap();
-	    
+
 	    // Draw x- and y-axis secondary lines
 	    drawSecondaryLines(g2);
 	    
-	    // Draw x- and y-axis 
+	    // Sets scale for base image
+		autoScale();
+		
+		// Draw x- and y-axis 
 	    drawAxis(g2);
 	    
 	    // Draw numbers on x- and y-axis
@@ -67,9 +74,6 @@ public class Plot extends JPanel
 	    if (data != null) {
 	    	drawFunction(g2);
 	    }
-	    
-	    // TODO Anhand der Extrempunkte usw. feststellen welcher Teil des Graphen überhaupt interessant ist.
-	    //System.out.println("Result: "+getLabel(-1.4123));
 	}
     
 	
@@ -152,14 +156,8 @@ public class Plot extends JPanel
 	 */
 	private void drawSecondaryLines(Graphics2D g)
 	{
-		if (data != null)
-		{
-			ArrayList<Double> test = data.getExtrema();
-			for (int i=0; i < test.size(); i++)
-			{
-				System.out.println(test.get(i));
-			}
-		}
+		this.xScaleMarkers = 0;
+		this.yScaleMarkers = 0;
 		
 		// X-Axis additions
 		int currentPosition = middle.yAsInt();
@@ -180,6 +178,7 @@ public class Plot extends JPanel
 		{
 			g.drawLine(0, currentPosition-markerGap, getWidth(), currentPosition-markerGap);
 			currentPosition -= markerGap;
+			this.yScaleMarkers++;
 			// DEBUG System.out.println("CurrentPosition y->0: "+currentPosition);
 		}
 		
@@ -202,6 +201,7 @@ public class Plot extends JPanel
 		{
 			g.drawLine(currentPosition-this.markerGap, 0, currentPosition-this.markerGap, getHeight());
 			currentPosition -= this.markerGap;
+			this.xScaleMarkers++;
 			// DEBUG System.out.println("CurrentPosition x->0: "+currentPosition+", "+this.markerGap);			
 		}
 	}
@@ -240,8 +240,7 @@ public class Plot extends JPanel
 	public Coordinate functionToPixel(double x, double y)
 	{
 		Coordinate result = new Coordinate(0,0);
-		
-		result.x = x * this.markerGap * this.scale.y + this.middle.x;
+		result.x = x * this.markerGap * this.scale.x + this.middle.x;
 		result.y = y * (-1) *this.markerGap * this.scale.y + this.middle.y ; 
 		
 		return result; 
@@ -257,8 +256,7 @@ public class Plot extends JPanel
 	public Coordinate pixelToFunction(double x, double y)
 	{
 		Coordinate result = new Coordinate(0,0);
-		
-		result.x = (x - this.middle.x) / (this.markerGap * this.scale.y);
+		result.x = (x - this.middle.x) / (this.markerGap * this.scale.x) + calculateXOffset();
 		result.y = (y - this.middle.y) / (this.markerGap * this.scale.y) * (-1);
 		
 		return result;
@@ -350,6 +348,23 @@ public class Plot extends JPanel
 		g.drawLine(from.xAsInt(), from.yAsInt(), infinity.xAsInt(), infinity.yAsInt());
 	}
 	
+	/**
+	 * Calculates Gap between each scale marker from left to right
+	 * @return distance (Real number) between markers
+	 */
+	private double calculateXAxisGap()
+	{
+		double gap = (this.xRangeTo - this.xRangeFrom)/xScaleMarkers;
+		this.xAxisLabels = new double[xScaleMarkers];
+
+		for (int i=0; i < xScaleMarkers; i++)
+		{
+			this.xAxisLabels[i] = this.xRangeFrom + i * gap;
+		}
+
+		return gap;
+	}
+
 
 	/**
 	 * Draws numbers on x- and y-axis for scale
@@ -367,11 +382,13 @@ public class Plot extends JPanel
 		int yPos = 0;
 		
 		// place 0 at origin
+		/*
 		label = "0";
 		xPos = (middle.xAsInt()-metrics.stringWidth("0"));
 		yPos = (middle.yAsInt()+metrics.getHeight());
 		g.drawString(label, xPos+offset, yPos+offset);
-		
+		*/
+
 		// draw the rest of the numbers
 		// x-axis
 		for (int i=2; i < xScaleMarkers/2 - 1; i+=2)
@@ -447,6 +464,19 @@ public class Plot extends JPanel
 		}
 	}
 	
+
+	/**
+	 * Calculates x-axis scale based on userinput
+	 */
+	public void autoScale()
+	{
+		double gap = calculateXAxisGap();
+		System.out.println("gap: "+gap);
+		System.out.println("xmark: "+this.xScaleMarkers);
+		System.out.println("Scale: "+gap/this.xScaleMarkers);
+		this.scale.x = gap;
+	}
+	
 	
 	/**
 	 * Changes Scale by some percentage depending on the input variable 
@@ -480,6 +510,12 @@ public class Plot extends JPanel
 		repaint();
 	}
 	
+
+	private double calculateXOffset()
+	{
+		return (this.xRangeFrom + this.xRangeTo)/2;
+	}
+
 	
 	/**
 	 * Sets data that will be used for drawing the graph

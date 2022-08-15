@@ -26,8 +26,8 @@ public class GUI extends JFrame
 		Image graph;
 	
 	
-	JFormattedTextField from;
-	JFormattedTextField to;
+	JTextField from;
+	JTextField to;
 	
 	
 	/**
@@ -125,8 +125,6 @@ public class GUI extends JFrame
 			
 			this.menuPanelBottom.add(buttonClear, format);
 		this.basePanel.add(menuPanelBottom, BorderLayout.SOUTH);	
-		
-		NumberFormat numFormat = DecimalFormat.getInstance();
 
 		JLabel labelFrom = new JLabel("from");
 			format.anchor = GridBagConstraints.EAST;
@@ -134,7 +132,7 @@ public class GUI extends JFrame
 
 			this.menuPanelBottom.add(labelFrom, format);
 
-		this.from = new JFormattedTextField(numFormat);
+		this.from = new JTextField();
 			from.setColumns(8);
 			from.setText("-10");
 			format.gridx = 3;
@@ -146,7 +144,7 @@ public class GUI extends JFrame
 
 			this.menuPanelBottom.add(labelTo, format);
 
-		this.to = new JFormattedTextField(numFormat);
+		this.to = new JTextField();
 			to.setColumns(8);
 			to.setText("10");
 			format.gridx = 5;
