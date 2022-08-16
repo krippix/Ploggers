@@ -6,7 +6,7 @@ import de.aop.exceptions.SyntaxError;
 
 /**
  * A wrapper around a Parser object with some additional
- * QoL life methods for function evaluation and analysis
+ * QoL methods for function evaluation and analysis
  */
 public class Function
 {
@@ -40,13 +40,7 @@ public class Function
 	private void analyze()
 	{
 		range = new Interval(this.at(domain.min), this.at(domain.min));
-		
-		for(double x = domain.min; x <= domain.max; x += 0.01)
-		{
-			double y = this.at(x);
-			range.min = Math.min(range.min, y);
-			range.max = Math.max(range.max, y);
-		}
+	
 		
 		roots 		= new ArrayList<Double>();
 		extrema 	= new ArrayList<Double>();
@@ -58,6 +52,36 @@ public class Function
 		findRoots(inflections, domain, 2);
 		
 		findPoles(domain);
+		
+		if(!poles.isEmpty())
+		{
+			if(!extrema.isEmpty()) 
+			{
+				for (Double x : extrema) 
+				{
+					range.min = Math.min(range.min, this.at(x));
+					range.max = Math.max(range.max, this.at(x));
+				}
+			}
+			else 
+			{
+				range.min = -10;
+				range.max = 10;
+			}
+		}
+		else
+		{
+			for(double x = domain.min; x <= domain.max; x += 0.01)
+			{
+				double y = this.at(x);
+				range.min = Math.min(range.min, y);
+				range.max = Math.max(range.max, y);
+			}
+		}
+		
+		double padding = range.length() * 0.1;
+		range.min -= padding;
+		range.max += padding;
 	}
 	
 	public ArrayList<Double> getRoots()
