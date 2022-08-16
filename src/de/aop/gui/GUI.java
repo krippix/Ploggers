@@ -201,7 +201,7 @@ public class GUI extends JFrame
 		} catch (Exception e){
 			System.out.println("left cant be smaller than right!");
 		}
-		this.contentPanel.setRange(Double.parseDouble(this.from.getText()),Double.parseDouble(this.to.getText()));
+		this.contentPanel.setDomain(Double.parseDouble(this.from.getText()),Double.parseDouble(this.to.getText()));
 		this.contentPanel.repaint();
 		
 	}

@@ -40,7 +40,7 @@ public class Plot extends JPanel
 	{
 		this.scale = new Coordinate(1,1);
 		// ToDo, Roberts dateityp entgegenehmen, oder in anderer Klasse die wichtigen Punkte berechnen
-		// Klasse dafür wird vermutlich Graph, in der sollen dann die Wichtigen Punkte und der Parse abgelegt werden.
+		// Klasse daf��r wird vermutlich Graph, in der sollen dann die Wichtigen Punkte und der Parse abgelegt werden.
 	}	
 	
 			
@@ -63,14 +63,12 @@ public class Plot extends JPanel
 	    // Draw x- and y-axis secondary lines
 	    drawSecondaryLines(g2);
 	    
-	    // Sets scale for base image
-		autoScale();
 		
 		// Draw x- and y-axis 
 	    drawAxis(g2);
 	    
 	    // Draw numbers on x- and y-axis
-	    drawPlotNumbering(g2);
+	    //drawPlotNumbering(g2);
 	    
 	    if (data != null) {
 	    	drawFunction(g2);
@@ -231,6 +229,14 @@ public class Plot extends JPanel
 	    g.drawLine(middle.xAsInt(), 0, middle.xAsInt()-4, 4);
 	}
 	
+
+	/**
+	 * Converts input value from one interval to another
+	 * @param from initial interval
+	 * @param to new interval
+	 * @param val value to convert
+	 * @return value in new interval
+	 */
 	public double map(Interval from, Interval to, double val)
 	{
 		return (val - from.min) * to.length() / from.length() + to.min;
@@ -275,87 +281,69 @@ public class Plot extends JPanel
 	 */
 	private void drawFunction(Graphics2D g)
 	{
+		// Settings for the drawn line
 		g.setColor(Color.red);
 		g.setStroke(new BasicStroke(2f));
 		
-		
+		// Define interval over which Graph will be visible
 		Interval screenWidth = new Interval(0, getWidth());
 		Interval screenHeight = new Interval(getHeight(), 0);
-		
-		int width = getWidth();
-		int xPixel = 0; // iterator from left to right of visible canvas
-		double xReal = 0; // x as Real number for function to use
-		boolean firstRun = true;
-		
-		Coordinate currentPoint = new Coordinate(0,0);
-		Coordinate previousPoint = new Coordinate(0,0);
-		
+				
 		ArrayList<Double> poles = data.getPoles();
 		
 		Interval domain = data.getDomain();
-		Interval range = data.getRange();
+		Interval range = determineRange();
+		
+		// Keep some free space above and below the drawn function
 		range.min -= range.length()* 0.1;
 		range.max += range.length()* 0.1;
 		
-		for(int i = 0; i < 500; i++)
+		// Set starting coordinates for drawing
+		Coordinate currentPoint = new Coordinate(0,0);
+		Coordinate previousPoint = new Coordinate(map(domain,screenWidth, domain.min-1),map(range,screenHeight,data.at(domain.min-1)));
+
+		// Drawing the Graph onto the grid
+		for(int i = 0; i < screenWidth.max; i++)
 		{
-			double x = domain.min + domain.length() * (double)i / 500.0;
+			double x = domain.min + domain.length() * (double)i / screenWidth.max;
 			double y = data.at(x);
-			
+
+			// System.out.println("x: "+x+" y: "+y);
+
 			currentPoint = new Coordinate(
 				map(domain, screenWidth, x),
 				map(range, screenHeight, y)
 			);
+
+			// System.out.println("Mapped: x:"+currentPoint.x+" y: "+currentPoint.y);
 			
-			g.drawLine(previousPoint.xAsInt(), previousPoint.yAsInt(), currentPoint.xAsInt(), currentPoint.yAsInt());
-			
-			previousPoint = currentPoint;
-		}
-		
-		/*
-		while (xPixel <= width)
-		{
-			xReal = pixelToFunction(xPixel, 0).x;
-			currentPoint.setCoordinates(xReal, data.at(xReal));
-			currentPoint = functionToPixel(currentPoint.x, currentPoint.y);
-		
-			if (firstRun)
+			// Avoid drawing lines through poles
+			boolean poleInbetween = false;
+			for(double pole : poles)
 			{
-				previousPoint = currentPoint.clone();
-				firstRun = false;
+				double poleScreen = map(domain, screenWidth, pole);
+				
+				if(previousPoint.x < poleScreen && poleScreen < currentPoint.x)
+				{
+					poleInbetween = true;
+					break;
+				}
 			}
-			
-			if (currentPoint.y < getHeight() * 1.2 && currentPoint.y > -getHeight()*0.2)
+			if(!poleInbetween)
 			{
-				// Avoid drawing lines through poles
-				boolean poleInbetween = false;
-				for(double pole : poles)
-				{
-					double poleScreen = functionToPixel(pole, 0).x;
-					
-					if(previousPoint.x < poleScreen && poleScreen < currentPoint.x)
-					{
-						poleInbetween = true;
-						break;
-					}
-				}
-					
-				if(!poleInbetween)
-				{
-					g.drawLine(previousPoint.xAsInt(), previousPoint.yAsInt(), currentPoint.xAsInt(), currentPoint.yAsInt());
+				// System.out.println("Connecting: "+previousPoint.xAsInt()+" ("+previousPoint.y+") and "+currentPoint.xAsInt());
+				g.drawLine(previousPoint.xAsInt(), previousPoint.yAsInt(), currentPoint.xAsInt(), currentPoint.yAsInt());
 				
-				}
-				else	// If there is a pole, connect the points with some point at infinity above/below them
-				{
-					connectWithInfinity(g, previousPoint, true);
-					connectWithInfinity(g, currentPoint, false);
-				}
-				
-				previousPoint = currentPoint.clone();
 			}
-			xPixel++;
+			else	// If there is a pole, connect the points with some point at infinity above/below them
+			{
+				System.out.println("Pole found between: "+previousPoint.x+" and "+currentPoint.x);
+				connectWithInfinity(g, previousPoint, true);
+				connectWithInfinity(g, currentPoint, false);
+			}
+			previousPoint = currentPoint.clone();
 		}
-		*/
+		System.out.println("Range: "+range.min+", "+range.max);
 	}
 	
 
@@ -369,7 +357,7 @@ public class Plot extends JPanel
 	private void connectWithInfinity(Graphics2D g, Coordinate from, boolean beforePole)
 	{
 		// The slope of the function at the point determines whether we connect with +inf or -inf
-		double x = pixelToFunction(from.x, from.y).x;
+		double x = map(data.getDomain(), new Interval(0,getWidth()), from.x);
 		double slope = data.at(x, 1);
 		
 		// If the point is after a pole, the logic needs to be inverted
@@ -379,6 +367,50 @@ public class Plot extends JPanel
 		g.drawLine(from.xAsInt(), from.yAsInt(), infinity.xAsInt(), infinity.yAsInt());
 	}
 	
+
+	private Interval determineRange()
+	{
+		ArrayList<Double> extrema = data.getExtrema();
+		Interval initialRange = data.getRange();
+
+		// If Range is line, change it for better display
+		if (initialRange.max - initialRange.min == 0)
+		{
+			return new Interval(initialRange.max-10, initialRange.max+10);
+		}
+		
+		if (extrema.size() <= 1)
+		{
+			return data.getRange();
+		}
+
+		// If multiple extrema exist, shift focus onto them
+		Double smallest = extrema.get(0);
+		for (int i=1; i < extrema.size(); i++)
+		{
+			smallest = Math.min(smallest, extrema.get(i));
+		}
+
+		Double largest = extrema.get(0);
+		for (int i=1; i < extrema.size(); i++)
+		{
+			largest = Math.max(largest, extrema.get(i));
+		}
+
+		if (largest == smallest)
+		{
+			data.getRange();
+		}
+		
+		System.out.println("Non-standard interval: "+smallest+", "+largest);
+		return new Interval(smallest,largest);
+	}
+
+	
+
+
+
+
 	/**
 	 * Calculates Gap between each scale marker from left to right
 	 * @return distance (Real number) between markers
@@ -494,20 +526,7 @@ public class Plot extends JPanel
 			return str_number;
 		}
 	}
-	
 
-	/**
-	 * Calculates x-axis scale based on userinput
-	 */
-	public void autoScale()
-	{
-		double gap = calculateXAxisGap();
-		System.out.println("gap: "+gap);
-		System.out.println("xmark: "+this.xScaleMarkers);
-		System.out.println("Scale: "+gap/this.xScaleMarkers);
-		this.scale.x = gap;
-	}
-	
 	
 	/**
 	 * Changes Scale by some percentage depending on the input variable 
@@ -568,15 +587,12 @@ public class Plot extends JPanel
 	 * @param from
 	 * @param to
 	 */
-	public void setRange(double from, double to) throws IllegalArgumentException
+	public void setDomain(double from, double to)
 	{
 		if (from < to)
 		{
-			this.xRangeFrom = from;
-			this.xRangeTo = to;
+			this.data.setDomain(from, to);
 			return;
 		}
-
-		throw new IllegalArgumentException();
 	}
 }
