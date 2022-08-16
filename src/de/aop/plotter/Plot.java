@@ -357,7 +357,7 @@ public class Plot extends JPanel
 	private void connectWithInfinity(Graphics2D g, Coordinate from, boolean beforePole)
 	{
 		// The slope of the function at the point determines whether we connect with +inf or -inf
-		double x = map(data.getDomain(), new Interval(0,getWidth()), from.x);
+		double x = map(new Interval(0,getWidth()), data.getDomain(), from.x);
 		double slope = data.at(x, 1);
 		
 		// If the point is after a pole, the logic needs to be inverted

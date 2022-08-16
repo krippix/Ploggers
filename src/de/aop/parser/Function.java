@@ -48,6 +48,12 @@ public class Function
 			range.max = Math.max(range.max, y);
 		}
 		
+		if(range.length() > 1e6)
+		{
+			range.min = -10;
+			range.max = 10;
+		}
+		
 		roots 		= new ArrayList<Double>();
 		extrema 	= new ArrayList<Double>();
 		inflections = new ArrayList<Double>();
