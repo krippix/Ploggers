@@ -246,6 +246,8 @@ public class Plot extends JPanel
 	 */
 	private void drawFunction(Graphics2D g)
 	{
+		System.out.println(getHeight());
+
 		// Settings for the drawn line
 		g.setColor(Color.red);
 		g.setStroke(new BasicStroke(2f));
@@ -257,7 +259,8 @@ public class Plot extends JPanel
 		ArrayList<Double> poles = data.getPoles();
 		
 		Interval domain = data.getDomain();
-		Interval range = data.getRange();
+		Interval range = new Interval(data.getRange().min, data.getRange().max);
+		
 		
 		// Keep some free space above and below the drawn function
 		range.min -= range.length()* 0.1;
@@ -302,13 +305,13 @@ public class Plot extends JPanel
 			}
 			else	// If there is a pole, connect the points with some point at infinity above/below them
 			{
-				System.out.println("Pole found between: "+previousPoint.x+" and "+currentPoint.x);
+				// System.out.println("Pole found between: "+previousPoint.x+" and "+currentPoint.x);
 				connectWithInfinity(g, previousPoint, true);
 				connectWithInfinity(g, currentPoint, false);
 			}
 			previousPoint = currentPoint.clone();
 		}
-		System.out.println("Range: "+range.min+", "+range.max);
+		// System.out.println("Range: "+range.min+", "+range.max);
 	}
 	
 
