@@ -52,7 +52,6 @@ public class GUI extends JFrame
 				@Override
 				public void windowClosing(WindowEvent e)
 				{
-					System.out.println("Exiting Software!");
 					System.exit(0);
 				}		
 			}

@@ -229,7 +229,6 @@ public class Plot extends JPanel
 		// Check x-axis
 		if (0 <= range.min || 0 >= range.max)
 		{
-			System.out.println("BREAK 1");
 			containsX = false;
 			
 			// check if x-axis is above or below the range
@@ -246,7 +245,6 @@ public class Plot extends JPanel
 		// Check y-axis
 		if (0 <= this.data.getDomain().min || 0 >= this.data.getDomain().max)
 		{
-			System.out.println("BREAK 2");
 			containsY = false;
 			// check if y-axis is to the left or right of the domain
 			if (domain.max < 0)
@@ -262,7 +260,6 @@ public class Plot extends JPanel
 		// draw contained axis
 		if (containsX)
 		{
-			System.out.println("X IS IN RANGE");
 			int xAxis = (int)map(range, new Interval(getHeight(), 0), 0);
 			// Just drawing black lines
 			g.drawLine(0, xAxis, getWidth(), xAxis);
@@ -274,7 +271,6 @@ public class Plot extends JPanel
 		}
 		if (containsY)
 		{
-			System.out.println("Y IS IN RANGE");
 			int yAxis = (int)map(domain, new Interval(0, getWidth()), 0);
 			g.drawLine(yAxis, 0, yAxis, getHeight());
 
@@ -493,8 +489,6 @@ public class Plot extends JPanel
 	 */
 	private void drawFunction(Graphics2D g)
 	{
-		System.out.println(getHeight());
-
 		// Settings for the drawn line
 		g.setColor(Color.red);
 		g.setStroke(new BasicStroke(2f));
@@ -518,14 +512,10 @@ public class Plot extends JPanel
 			double x = domain.min + domain.length() * (double)i / screenWidth.max;
 			double y = data.at(x);
 
-			// System.out.println("x: "+x+" y: "+y);
-
 			currentPoint = new Coordinate(
 				map(domain, screenWidth, x),
 				map(range, screenHeight, y)
 			);
-
-			// System.out.println("Mapped: x:"+currentPoint.x+" y: "+currentPoint.y);
 			
 			// Avoid drawing lines through poles
 			boolean poleInbetween = false;
@@ -541,19 +531,16 @@ public class Plot extends JPanel
 			}
 			if(!poleInbetween)
 			{
-				// System.out.println("Connecting: "+previousPoint.xAsInt()+" ("+previousPoint.y+") and "+currentPoint.xAsInt());
 				g.drawLine(previousPoint.xAsInt(), previousPoint.yAsInt(), currentPoint.xAsInt(), currentPoint.yAsInt());
 				
 			}
 			else	// If there is a pole, connect the points with some point at infinity above/below them
 			{
-				// System.out.println("Pole found between: "+previousPoint.x+" and "+currentPoint.x);
 				connectWithInfinity(g, previousPoint, true);
 				connectWithInfinity(g, currentPoint, false);
 			}
 			previousPoint = currentPoint.clone();
 		}
-		// System.out.println("Range: "+range.min+", "+range.max);
 	}
 	
 
