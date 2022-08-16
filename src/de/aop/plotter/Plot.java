@@ -152,7 +152,6 @@ public class Plot extends JPanel
 	private void drawGrid(Graphics2D canvas)
 	{
 		//Interval domain = this.data.getDomain();
-
 		canvas.setColor(Color.lightGray);
 
 		// x-Axis ===
