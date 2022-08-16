@@ -285,30 +285,28 @@ public class Plot extends JPanel
 	 */
 	private void labelAxis(Graphics2D g, xAxis xLocation, yAxis yLocation)
 	{
-		int height = middle.xAsInt();
-		int yOffset = 11;
+		int height = middle.yAsInt();
+		int width = middle.xAsInt();
+		int yOffset = 8;
 		int xOffset = -6;
 
 		switch (xLocation)
 		{
 			case WITHIN:
 			{
-				System.out.println("du");
 				if (data != null)
 				{
-					height = (int)map(this.data.getRange(), new Interval(getHeight(), 0), 0) + yOffset;
+					height = (int)map(this.data.getRange(), new Interval(getHeight(), 0), 0) + xOffset;
 				}
 				break;
 			}
 			case TOP:
 			{
-				System.out.println("dummer");
 				height = 12;
 				break;
 			}
 			case BOTTOM:
 			{
-				System.out.println("hurensohn");
 				height = getHeight() - 8;
 				break;
 			}
@@ -328,6 +326,40 @@ public class Plot extends JPanel
 			val = (int)this.middle.xAsInt()-i*this.markerGap;
 			valStr = df.format(map(new Interval(0,getWidth()),data.getDomain(),val));
 			g.drawString(valStr, val+xOffset, height);
+		}
+		
+		switch (yLocation)
+		{
+			case WITHIN:
+			{
+				if (data != null)
+				{
+					width = (int)map(this.data.getDomain(), new Interval(0, getWidth()), 0) + yOffset;
+				}
+				break;
+			}
+			case LEFT:
+			{
+				width = 10;
+				break;
+			}
+			case RIGHT:
+			{
+				height = getWidth() - 10;
+				break;
+			}
+		}
+
+		// y-Axis ===
+		for (int i=0; i * this.markerGap < getHeight()/2; i += 2)
+		{
+			val = (int)this.middle.yAsInt()+i*this.markerGap;
+			valStr = df.format(map(new Interval(getHeight(), 0),data.getRange(),val));
+			g.drawString(valStr, width, val+yOffset);
+
+			val = (int)this.middle.yAsInt()-i*this.markerGap;
+			valStr = df.format(map(new Interval(getHeight(), 0),data.getRange(),val));
+			g.drawString(valStr, width, val+yOffset);
 		}
 		
 	}
