@@ -39,7 +39,7 @@ public class Function
 	
 	private void analyze()
 	{
-		range = new Interval(0, 0);
+		range = new Interval(this.at(domain.min), this.at(domain.min));
 	
 		
 		roots 		= new ArrayList<Double>();
@@ -78,6 +78,10 @@ public class Function
 				range.max = Math.max(range.max, y);
 			}
 		}
+		
+		double padding = range.length() * 0.1;
+		range.min -= padding;
+		range.max += padding;
 	}
 	
 	public ArrayList<Double> getRoots()

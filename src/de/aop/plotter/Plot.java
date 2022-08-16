@@ -219,7 +219,7 @@ public class Plot extends JPanel
 		domain = this.data.getDomain();
 
 		// Check x-axis
-		if (0 < range.min - range.length()* 0.1 || 0 > range.max + range.length()*0.1)
+		if (0 <= range.min || 0 >= range.max)
 		{
 			System.out.println("BREAK 1");
 			containsX = false;
@@ -236,7 +236,7 @@ public class Plot extends JPanel
 		}
 
 		// Check y-axis
-		if (0 < this.data.getDomain().min || 0 > this.data.getDomain().max)
+		if (0 <= this.data.getDomain().min || 0 >= this.data.getDomain().max)
 		{
 			System.out.println("BREAK 2");
 			containsY = false;
@@ -293,21 +293,23 @@ public class Plot extends JPanel
 		{
 			case WITHIN:
 			{
+				System.out.println("du");
 				if (data != null)
 				{
-					System.out.println("DO WE HERE YEET");
 					height = (int)map(this.data.getRange(), new Interval(getHeight(), 0), 0) + yOffset;
 				}
 				break;
 			}
 			case TOP:
 			{
-				height = getHeight() + 2;
+				System.out.println("dummer");
+				height = 12;
 				break;
 			}
 			case BOTTOM:
 			{
-				height = -8;
+				System.out.println("hurensohn");
+				height = getHeight() - 8;
 				break;
 			}
 		}
@@ -417,12 +419,7 @@ public class Plot extends JPanel
 		ArrayList<Double> poles = data.getPoles();
 		
 		Interval domain = data.getDomain();
-		Interval range = new Interval(data.getRange().min, data.getRange().max);
-		
-		
-		// Keep some free space above and below the drawn function
-		range.min -= range.length()* 0.1;
-		range.max += range.length()* 0.1;
+		Interval range = data.getRange();
 		
 		// Set starting coordinates for drawing
 		Coordinate currentPoint = new Coordinate(0,0);
