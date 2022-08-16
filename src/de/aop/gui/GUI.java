@@ -157,21 +157,6 @@ public class GUI extends JFrame
 		this.contentPanel.setBackground(Color.white);
 		this.basePanel.add(this.contentPanel, BorderLayout.CENTER);
 
-		// React to mouse wheel
-		this.contentPanel.addMouseWheelListener(new MouseWheelListener()
-		{
-			public void mouseWheelMoved(MouseWheelEvent e)
-			{
-				// contentPanel.changeScale(e.getWheelRotation());
-				Interval domain = contentPanel.getData().getDomain();
-				domain.min--;
-				domain.max++;
-				
-				contentPanel.getData().setDomain(domain.min, domain.max);
-				contentPanel.repaint();
-			}
-		});
-
 		contentPanel.repaint();
 		this.window.pack();
 		this.window.setVisible(true);

@@ -21,9 +21,6 @@ public class Plot extends JPanel
 	private static final int Y_SCALE_MARKERS_MIN = 10; // Minimum amount of markers going from middle to left and right each
 	private int xScaleMarkers = 0; // actual number of scale markers
 	private int yScaleMarkers = 0; // actual number of scale markers
-	private double xRangeFrom = -10;
-	private double xRangeTo = 10;
-	private double xOffset = 0; // Offset how far away from x0 current middle is. 
 	private double[] xAxisLabels;
 	private double[] yAxisLabels;
 	private Function data;
@@ -60,10 +57,9 @@ public class Plot extends JPanel
 	    // Calculate biggest marker gap that keeps the graph intact
 	    calcMarkerGap();
 
-	    // Draw x- and y-axis secondary lines
-	    drawSecondaryLines(g2);
+		// Draw grid of the canvas
+		drawGrid(g2);
 	    
-		
 		// Draw x- and y-axis 
 	    drawAxis(g2);
 	    
@@ -150,58 +146,27 @@ public class Plot extends JPanel
 	
 	
 	/**
-	 * Draws background lines for Plot
-	 * @param Graphics object to wich lines are drawn
+	 * Function that draws the grid lines onto the canvas
+	 * @param g
 	 */
-	private void drawSecondaryLines(Graphics2D g)
+	private void drawGrid(Graphics2D canvas)
 	{
-		this.xScaleMarkers = 0;
-		this.yScaleMarkers = 0;
-		
-		// X-Axis additions
-		int currentPosition = middle.yAsInt();
-		g.setColor(Color.lightGray);
-		
-		// middle -> y=MAX
-		while (currentPosition + this.markerGap < getHeight())
+		//Interval domain = this.data.getDomain();
+
+		canvas.setColor(Color.lightGray);
+
+		// x-Axis ===
+		for (int i=0; i*markerGap < getHeight()/2; i++)
 		{
-			g.drawLine(0, currentPosition+this.markerGap, getWidth(), currentPosition+this.markerGap);
-			currentPosition += this.markerGap;
-			this.yScaleMarkers++;
-			// DEBUG System.out.println("CurrentPosition y->MAX: "+currentPosition+", "+this.markerGap);			
+			canvas.drawLine(0, this.middle.yAsInt()+i*markerGap, getWidth(), this.middle.yAsInt()+i*markerGap);
+			canvas.drawLine(0, this.middle.yAsInt()-i*markerGap, getWidth(), this.middle.yAsInt()-i*markerGap);
 		}
-		
-		currentPosition = middle.yAsInt();
-		// middle -> y=0
-		while (currentPosition - markerGap > 0)
+
+		// y-axis ||||
+		for (int i=0; i*markerGap < getWidth(); i++)
 		{
-			g.drawLine(0, currentPosition-markerGap, getWidth(), currentPosition-markerGap);
-			currentPosition -= markerGap;
-			this.yScaleMarkers++;
-			// DEBUG System.out.println("CurrentPosition y->0: "+currentPosition);
-		}
-		
-		// Y-Axis additions
-		currentPosition = middle.xAsInt();
-		g.setColor(Color.lightGray);
-		
-		// middle -> x=MAX
-		while (currentPosition + this.markerGap < getWidth())
-		{
-			g.drawLine(currentPosition+this.markerGap, 0, currentPosition+this.markerGap, getHeight());
-			currentPosition += this.markerGap;
-			this.xScaleMarkers++;
-			// DEBUG System.out.println("CurrentPosition x->MAX: "+currentPosition+", "+this.markerGap);			
-		}
-		
-		currentPosition = middle.xAsInt();
-		// middle -> x=0
-		while (currentPosition - this.markerGap > 0)
-		{
-			g.drawLine(currentPosition-this.markerGap, 0, currentPosition-this.markerGap, getHeight());
-			currentPosition -= this.markerGap;
-			this.xScaleMarkers++;
-			// DEBUG System.out.println("CurrentPosition x->0: "+currentPosition+", "+this.markerGap);			
+			canvas.drawLine(this.middle.xAsInt()+i*markerGap, getHeight(), this.middle.xAsInt()+i*markerGap, 0);
+			canvas.drawLine(this.middle.xAsInt()-i*markerGap, getHeight(), this.middle.xAsInt()-i*markerGap, 0);
 		}
 	}
 	
@@ -292,7 +257,7 @@ public class Plot extends JPanel
 		ArrayList<Double> poles = data.getPoles();
 		
 		Interval domain = data.getDomain();
-		Interval range = determineRange();
+		Interval range = data.getRange();
 		
 		// Keep some free space above and below the drawn function
 		range.min -= range.length()* 0.1;
@@ -368,61 +333,18 @@ public class Plot extends JPanel
 	}
 	
 
-	private Interval determineRange()
-	{
-		ArrayList<Double> extrema = data.getExtrema();
-		Interval initialRange = data.getRange();
-
-		// If Range is line, change it for better display
-		if (initialRange.max - initialRange.min == 0)
-		{
-			return new Interval(initialRange.max-10, initialRange.max+10);
-		}
-		
-		if (extrema.size() <= 1)
-		{
-			return data.getRange();
-		}
-
-		// If multiple extrema exist, shift focus onto them
-		Double smallest = extrema.get(0);
-		for (int i=1; i < extrema.size(); i++)
-		{
-			smallest = Math.min(smallest, extrema.get(i));
-		}
-
-		Double largest = extrema.get(0);
-		for (int i=1; i < extrema.size(); i++)
-		{
-			largest = Math.max(largest, extrema.get(i));
-		}
-
-		if (largest == smallest)
-		{
-			data.getRange();
-		}
-		
-		System.out.println("Non-standard interval: "+smallest+", "+largest);
-		return new Interval(smallest,largest);
-	}
-
-	
-
-
-
-
 	/**
 	 * Calculates Gap between each scale marker from left to right
 	 * @return distance (Real number) between markers
 	 */
 	private double calculateXAxisGap()
 	{
-		double gap = (this.xRangeTo - this.xRangeFrom)/xScaleMarkers;
+		double gap = (this.data.getDomain().max - this.data.getDomain().min)/xScaleMarkers;
 		this.xAxisLabels = new double[xScaleMarkers];
 
 		for (int i=0; i < xScaleMarkers; i++)
 		{
-			this.xAxisLabels[i] = this.xRangeFrom + i * gap;
+			this.xAxisLabels[i] = this.data.getDomain().max + i * gap;
 		}
 
 		return gap;
@@ -558,12 +480,6 @@ public class Plot extends JPanel
 		
 		data.setDomain(pixelToFunction(0, 0).x, pixelToFunction(getWidth(), 0).x);
 		repaint();
-	}
-	
-
-	private double calculateXOffset()
-	{
-		return (this.xRangeFrom + this.xRangeTo)/2;
 	}
 
 	
