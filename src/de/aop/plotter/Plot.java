@@ -63,6 +63,8 @@ public class Plot extends JPanel
 	    
 	    if (data != null) {
 	    	drawFunction(g2);
+	    	
+	    	drawInterestingPoints(g2);
 	    }
 	}
     
@@ -277,6 +279,53 @@ public class Plot extends JPanel
 		}
 
 		labelAxis(g, xaxis, yaxis);
+	}
+	
+	private void drawInterestingPoints(Graphics2D g)
+	{
+		g.setColor(Color.GRAY);
+		
+		Interval domain = this.data.getDomain();
+		Interval range = this.data.getRange();
+		
+		Interval screenWidth = new Interval(0, getWidth());
+		Interval screenHeight = new Interval(getHeight(), 0);
+		
+		for(double x : data.getRoots())
+		{
+			double y = data.at(x);
+			
+			Coordinate point = new Coordinate(
+				map(domain, screenWidth, x),
+				map(range, screenHeight, y)
+			);
+			
+			g.fillOval(point.xAsInt() - 4, point.yAsInt() - 4, 9, 9);
+		}
+		
+		for(double x : data.getExtrema())
+		{
+			double y = data.at(x);
+			
+			Coordinate point = new Coordinate(
+					map(domain, screenWidth, x),
+					map(range, screenHeight, y)
+				);
+			
+			g.fillOval(point.xAsInt() - 4, point.yAsInt() - 4, 9, 9);
+		}
+		
+		for(double x : data.getInflections())
+		{
+			double y = data.at(x);
+			
+			Coordinate point = new Coordinate(
+					map(domain, screenWidth, x),
+					map(range, screenHeight, y)
+				);
+			
+			g.fillOval(point.xAsInt() - 4, point.yAsInt() - 4, 9, 9);
+		}
 	}
 	
 	/**
