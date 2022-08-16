@@ -30,6 +30,8 @@ public class GUI extends JFrame
 	JTextField from;
 	JTextField to;
 	
+	JCheckBox drawPoints;
+	
 	
 	/**
 	 * Builds the GUI
@@ -152,6 +154,13 @@ public class GUI extends JFrame
 
 			this.menuPanelBottom.add(to, format);
 		
+		this.drawPoints = new JCheckBox();
+		this.drawPoints.setText("Show roots and extrema");	
+		this.drawPoints.setSelected(true);
+		
+		format.gridx = 6;
+		this.menuPanelBottom.add(this.drawPoints, format);
+			
 		// Content panel
 		this.contentPanel = new Plot();
 		this.contentPanel.setBackground(Color.white);
@@ -186,7 +195,9 @@ public class GUI extends JFrame
 		} catch (Exception e){
 			System.out.println("left cant be smaller than right!");
 		}
+		
 		this.contentPanel.setDomain(Double.parseDouble(this.from.getText()),Double.parseDouble(this.to.getText()));
+		this.contentPanel.showInterestingPoints(this.drawPoints.isSelected());
 		this.contentPanel.repaint();
 		
 	}

@@ -27,6 +27,7 @@ public class Plot extends JPanel
 	private Function data;
 	private int markerGap;
 	private Coordinate middle;
+	private boolean showInterestingPoints = false;
 	enum xAxis {WITHIN, TOP, BOTTOM};
 	enum yAxis {WITHIN, LEFT, RIGHT};
 	
@@ -64,7 +65,8 @@ public class Plot extends JPanel
 	    if (data != null) {
 	    	drawFunction(g2);
 	    	
-	    	drawInterestingPoints(g2);
+	    	if(showInterestingPoints)
+	    		drawInterestingPoints(g2);
 	    }
 	}
     
@@ -122,6 +124,10 @@ public class Plot extends JPanel
 		this.markerGap = Math.min(xGap, yGap);
 	}
 	
+	public void showInterestingPoints(boolean enabled) 
+	{
+		showInterestingPoints = enabled;
+	}
 	
 	/**
 	 * Helper function for calcMarkerGap()
@@ -210,7 +216,7 @@ public class Plot extends JPanel
 			g.drawLine(getWidth(), middle.yAsInt(), getWidth()-4, middle.yAsInt()-4);
 			g.drawLine(getWidth(), middle.yAsInt(), getWidth()-4, middle.yAsInt()+4);
 			
-			g.drawString("y", middle.xAsInt()+6, metrics.getHeight());
+			g.drawString("y", middle.xAsInt()-10, metrics.getHeight());
 			g.drawLine(middle.xAsInt(), 0, middle.xAsInt()+4, 4);
 			g.drawLine(middle.xAsInt(), 0, middle.xAsInt()-4, 4);
 			return;
@@ -273,7 +279,7 @@ public class Plot extends JPanel
 			g.drawLine(yAxis, 0, yAxis, getHeight());
 
 			// arrow
-			g.drawString("y", yAxis+6, metrics.getHeight());
+			g.drawString("y", yAxis-10, metrics.getHeight());
 			g.drawLine(yAxis, 0, yAxis+4, 4);
 			g.drawLine(yAxis, 0, yAxis-4, 4);
 		}
